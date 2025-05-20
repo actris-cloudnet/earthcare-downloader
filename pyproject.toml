@@ -18,12 +18,15 @@ classifiers = [
   "Programming Language :: Python :: 3",
   "Topic :: Scientific/Engineering :: Atmospheric Science",
 ]
-dependencies = ["numpy"]
+dependencies = ["aiohttp", "beautifulsoup4", "platformdirs", "tqdm"]
 dynamic = ["version"]
 
 [project.optional-dependencies]
-test = ["mypy", "pytest"]
-dev = ["pre-commit", "release-version"]
+test = ["pytest"]
+dev = ["mypy", "pre-commit", "release-version", "types-tqdm"]
+
+[project.scripts]
+earthcare-downloader = "earthcare_downloader.cli:main"
 
 [project.urls]
 Homepage = "https://github.com/actris-cloudnet/earthcare-downloader"
