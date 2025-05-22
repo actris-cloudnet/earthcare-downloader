@@ -12,7 +12,7 @@ python3 -m pip install earthcare-downloader
 
 ## Usage
 
-### Credentials
+### Authentication
 
 Store your [ESA EO Sign In](https://eoiam-idp.eo.esa.int/) credentials in the environment variables `ESA_EO_USERNAME` and `ESA_EO_PASSWORD`.
 If these variables are not set, the program will prompt you to enter your credentials.

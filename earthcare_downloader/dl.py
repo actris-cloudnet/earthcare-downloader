@@ -73,27 +73,24 @@ async def download_files(
 
     session = await _init_session(urls[0])
     semaphore = asyncio.Semaphore(max_workers)
+    bar_config = BarConfig(len(urls), max_workers, disable_progress)
 
     async with session:
-        bar_config = BarConfig(len(urls), max_workers, disable_progress)
         tasks = []
         for url in urls:
             destination = output_path / url.split("/")[-1]
             full_paths.append(destination)
-            tasks.append(
-                asyncio.create_task(
-                    _download_file_with_retries(
-                        session, url, destination, semaphore, bar_config
-                    )
-                )
+            task = asyncio.create_task(
+                _download_with_retries(session, url, destination, semaphore, bar_config)
             )
+            tasks.append(task)
         await asyncio.gather(*tasks)
         bar_config.overall.close()
         bar_config.overall.clear()
     return full_paths
 
 
-async def _download_file_with_retries(
+async def _download_with_retries(
     session: aiohttp.ClientSession,
     url: str,
     destination: Path,
