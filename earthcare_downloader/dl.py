@@ -59,8 +59,15 @@ async def download_overpass_data(
 ) -> list[Path]:
     output_path.mkdir(parents=True, exist_ok=True)
     urls = await metadata.get_files(product, lat, lon, distance)
-    logging.info(f"Found {len(urls)} files to download.")
-    return await download_files(urls, output_path, max_workers) if urls else []
+    if not urls:
+        logging.info("No files found.")
+        return []
+
+    response = input(f"Proceed with downloading {len(urls)} files? [y/n]: ")
+    if response.strip().lower() not in ("y", "yes"):
+        return []
+
+    return await download_files(urls, output_path, max_workers)
 
 
 async def download_files(
