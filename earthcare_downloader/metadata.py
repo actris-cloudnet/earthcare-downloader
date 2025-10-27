@@ -4,6 +4,8 @@ import aiohttp
 
 from earthcare_downloader import utils
 
+from .utils import SearchParams
+
 Prod = Literal[
     # L1 products
     "ATL_NOM_1B",
@@ -35,25 +37,30 @@ Prod = Literal[
 ]
 
 
-async def get_files(
-    product: Prod, lat: float, lon: float, distance: float = 200
-) -> list[str]:
-    lat_buffer = utils.distance_to_lat_deg(distance)
-    lon_buffer = utils.distance_to_lon_deg(lat, distance)
-    level = "2" if "2" in product else "1"
+async def get_files(params: SearchParams) -> list[str]:
+    lat_buffer = utils.distance_to_lat_deg(params.distance)
+    lon_buffer = utils.distance_to_lon_deg(params.lat, params.distance)
+    level = "2" if "2" in params.product else "1"
     url = (
         f"https://ec-pdgs-discovery.eo.esa.int/socat/EarthCAREL{level}Validated/search"
     )
+
     query_params = {
         "service": "SimpleOnlineCatalogue",
         "version": "1.2",
         "request": "search",
         "format": "text/plain",
-        "query.footprint.minlat": lat - lat_buffer,
-        "query.footprint.minlon": lon - lon_buffer,
-        "query.footprint.maxlat": lat + lat_buffer,
-        "query.footprint.maxlon": lon + lon_buffer,
-        "query.productType": product,
+        "query.footprint.minlat": params.lat - lat_buffer,
+        "query.footprint.minlon": params.lon - lon_buffer,
+        "query.footprint.maxlat": params.lat + lat_buffer,
+        "query.footprint.maxlon": params.lon + lon_buffer,
+        "query.productType": params.product,
+        "query.beginAcquisition.start": params.start,
+        "query.endAcquisition.stop": params.stop,
+        "query.endAcquisition.start": params.start,
+        "query.beginAcquisition.stop": params.stop,
+        "query.orbitNumber.min": params.orbit_min,
+        "query.orbitNumber.max": params.orbit_max,
     }
 
     async with (

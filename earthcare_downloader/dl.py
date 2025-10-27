@@ -2,6 +2,8 @@ import asyncio
 import logging
 import os
 import pickle
+import zipfile
+from dataclasses import dataclass
 from getpass import getpass
 from pathlib import Path
 
@@ -12,6 +14,8 @@ from tqdm import tqdm
 from earthcare_downloader import metadata
 from earthcare_downloader.html_parser import HTMLParser
 
+from .utils import SearchParams, TaskParams
+
 FILE_PATH = Path(__file__).resolve().parent
 COOKIE_PATH = (
     Path(user_cache_dir("earthcare_downloader", ensure_exists=True)) / "cookies.pkl"
@@ -19,11 +23,9 @@ COOKIE_PATH = (
 
 
 class BarConfig:
-    def __init__(
-        self, n_data: int, max_workers: int, disable_progress: bool | None
-    ) -> None:
-        self.disable_progress = disable_progress
-        self.position_queue = self._init_position_queue(max_workers)
+    def __init__(self, n_data: int, task_params: TaskParams) -> None:
+        self.disable_progress = task_params.disable_progress
+        self.position_queue = self._init_position_queue(task_params.max_workers)
         self.total_amount = tqdm(
             total=0,
             desc="Total amount",
@@ -50,46 +52,68 @@ class BarConfig:
 
 
 async def download_overpass_data(
-    lat: float,
-    lon: float,
-    distance: float,
-    product: metadata.Prod,
-    max_workers: int,
-    output_path: Path,
+    search_params: SearchParams,
+    task_params: TaskParams,
 ) -> list[Path]:
-    output_path.mkdir(parents=True, exist_ok=True)
-    urls = await metadata.get_files(product, lat, lon, distance)
+    task_params.output_path.mkdir(parents=True, exist_ok=True)
+    urls = await metadata.get_files(search_params)
     if not urls:
         logging.info("No files found.")
         return []
 
-    response = input(f"Proceed with downloading {len(urls)} files? [y/n]: ")
-    if response.strip().lower() not in ("y", "yes"):
+    if task_params.show and not task_params.no_prompt:
+        for url in urls:
+            logging.info(url)
+
+    if not task_params.no_prompt:
+        confirmed = input(
+            f"Proceed with downloading {len(urls)} files? [y/n]: "
+        ).strip().lower() in ("y", "yes")
+    else:
+        confirmed = True
+
+    if not confirmed:
         return []
 
-    return await download_files(urls, output_path, max_workers)
+    return await download_files(urls, task_params)
+
+
+@dataclass
+class DlParams:
+    url: str
+    destination: Path
+    session: aiohttp.ClientSession
+    semaphore: asyncio.Semaphore
+    bar_config: BarConfig
+    unzip: bool
 
 
 async def download_files(
     urls: list[str],
-    output_path: Path,
-    max_workers: int,
-    disable_progress: bool | None = None,
+    task_params: TaskParams,
 ) -> list[Path]:
     full_paths = []
 
     session = await _init_session(urls[0])
-    semaphore = asyncio.Semaphore(max_workers)
-    bar_config = BarConfig(len(urls), max_workers, disable_progress)
+    semaphore = asyncio.Semaphore(task_params.max_workers)
+    bar_config = BarConfig(len(urls), task_params)
 
     async with session:
         tasks = []
         for url in urls:
-            destination = output_path / url.split("/")[-1]
-            full_paths.append(destination)
-            task = asyncio.create_task(
-                _download_with_retries(session, url, destination, semaphore, bar_config)
+            destination = task_params.output_path / url.split("/")[-1]
+
+            dl_stuff = DlParams(
+                url=url,
+                destination=destination,
+                session=session,
+                semaphore=semaphore,
+                bar_config=bar_config,
+                unzip=task_params.unzip,
             )
+
+            full_paths.append(destination)
+            task = asyncio.create_task(_download_with_retries(dl_stuff))
             tasks.append(task)
         await asyncio.gather(*tasks)
         bar_config.overall.close()
@@ -98,66 +122,62 @@ async def download_files(
 
 
 async def _download_with_retries(
-    session: aiohttp.ClientSession,
-    url: str,
-    destination: Path,
-    semaphore: asyncio.Semaphore,
-    bar_config: BarConfig,
+    params: DlParams,
 ) -> None:
-    position = await bar_config.position_queue.get()
+    position = await params.bar_config.position_queue.get()
     try:
         max_retries = 3
         for attempt in range(1, max_retries + 1):
             try:
                 await _download_file(
-                    session,
-                    url,
-                    destination,
-                    semaphore,
-                    bar_config,
+                    params,
                     position,
                 )
+                if params.unzip and params.destination.suffix.lower() == ".zip":
+                    with zipfile.ZipFile(params.destination, "r") as zip_ref:
+                        for file_info in zip_ref.filelist:
+                            if file_info.filename.lower().endswith(".h5"):
+                                zip_ref.extract(file_info, params.destination.parent)
+                    params.destination.unlink()
                 return
             except aiohttp.ClientError as e:
-                logging.warning(f"Attempt {attempt} failed for {url}: {e}")
+                logging.warning(f"Attempt {attempt} failed for {params.url}: {e}")
                 if attempt == max_retries:
-                    logging.error(f"Giving up on {url} after {max_retries} attempts.")
+                    logging.error(
+                        f"Giving up on {params.url} after {max_retries} attempts."
+                    )
                     raise
                 await asyncio.sleep(2**attempt)
     finally:
-        bar_config.position_queue.put_nowait(position)
+        params.bar_config.position_queue.put_nowait(position)
 
 
 async def _download_file(
-    session: aiohttp.ClientSession,
-    url: str,
-    destination: Path,
-    semaphore: asyncio.Semaphore,
-    bar_config: BarConfig,
+    params: DlParams,
     position: int,
 ) -> None:
-    async with semaphore, session.get(url) as response:
+    async with params.semaphore, params.session.get(params.url) as response:
         response.raise_for_status()
         bar = tqdm(
-            desc=destination.name,
+            desc=params.destination.name,
             total=response.content_length,
             unit="iB",
             unit_scale=True,
             unit_divisor=1024,
-            disable=bar_config.disable_progress,
+            disable=params.bar_config.disable_progress,
             position=position,
             leave=False,
         )
         try:
-            with destination.open("wb") as f:
+            with params.destination.open("wb") as f:
                 while chunk := await response.content.read(8192):
                     f.write(chunk)
                     bar.update(len(chunk))
-                    bar_config.total_amount.update(len(chunk))
+                    params.bar_config.total_amount.update(len(chunk))
         finally:
             bar.close()
             bar.clear()
-    bar_config.overall.update(1)
+    params.bar_config.overall.update(1)
 
 
 async def _init_session(test_url: str) -> aiohttp.ClientSession:
