@@ -3,6 +3,7 @@ import logging
 import os
 import pickle
 import zipfile
+from contextlib import suppress
 from dataclasses import dataclass
 from getpass import getpass
 from pathlib import Path
@@ -34,6 +35,7 @@ class BarConfig:
             unit_divisor=1024,
             disable=self.disable_progress,
             position=0,
+            leave=False,
         )
         self.overall = tqdm(
             total=n_data,
@@ -41,6 +43,8 @@ class BarConfig:
             unit="file",
             disable=self.disable_progress,
             position=1,
+            colour="green",
+            leave=False,
         )
         self.lock = asyncio.Lock()
 
@@ -189,9 +193,11 @@ async def _init_session(test_url: str) -> aiohttp.ClientSession:
             session.cookie_jar._cookies = pickle.load(f)
     try:
         async with session.get(test_url) as res:
-            if "login" in str(res.url).lower() or res.status in {401, 403}:
-                logging.info("Session expired or not authenticated. Logging in...")
-                await _authenticate_session(session, test_url)
+            res_url = str(res.url).lower()
+            if "login" in res_url or res.status in {401, 403} or "samlsso" in res_url:
+                logging.warning("Session expired or not authenticated. Logging in...")
+                login_url = f"{test_url.split('data')[0]}access/login"
+                await _authenticate_session(session, login_url)
                 with COOKIE_PATH.open("wb") as f:
                     if not isinstance(session.cookie_jar, aiohttp.CookieJar):
                         raise RuntimeError("Bad cookies!")
@@ -202,20 +208,24 @@ async def _init_session(test_url: str) -> aiohttp.ClientSession:
     return session
 
 
-async def _authenticate_session(session: aiohttp.ClientSession, test_url: str) -> None:
+async def _authenticate_session(session: aiohttp.ClientSession, login_url: str) -> None:
     credentials = _get_credentials()
-    async with session.get(test_url, auth=aiohttp.BasicAuth(*credentials)) as res:
+    async with session.get(login_url, auth=aiohttp.BasicAuth(*credentials)) as res:
         res.raise_for_status()
         text = await res.text()
 
     parser = HTMLParser(text)
-    auth_url = parser.parse_url()
+    try:
+        auth_url = parser.parse_url()
+    except ValueError:
+        auth_url = login_url
     payload = {
         "tocommonauth": "true",
         "username": credentials[0],
         "password": credentials[1],
-        "sessionDataKey": parser.parse_session_key(),
     }
+    with suppress(ValueError):
+        payload["sessionDataKey"] = parser.parse_session_key()
 
     async with session.post(auth_url, data=payload) as res:
         res.raise_for_status()
