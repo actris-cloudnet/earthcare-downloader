@@ -65,7 +65,7 @@ async def download_overpass_data(
         logging.info("No files found.")
         return []
 
-    if task_params.show and not task_params.no_prompt:
+    if task_params.show:
         for url in urls:
             logging.info(url)
 
@@ -171,6 +171,7 @@ async def _download_file(
             disable=params.bar_config.disable_progress,
             position=position,
             leave=False,
+            colour="cyan",
         )
         try:
             with params.destination.open("wb") as f:

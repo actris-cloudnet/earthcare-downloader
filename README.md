@@ -34,14 +34,14 @@ where the arguments are:
 | `-d`, `--distance`    | Search radius around the location in km (default: **200**).      |
 | `--start`             | Start date (YYYY-MM-DD).                                         |
 | `--stop`              | Stop date (YYYY-MM-DD).                                          |
-| `--orbit_min`         | Minimum orbit number (default: **0**).                           |
-| `--orbit_max`         | Maximum orbit number (default: infinite).                        |
-| `-o`, `--output_path` | Directory to save downloaded files (default: current directory). |
-| `--max_workers`       | Maximum number of concurrent downloads (default: **5**).         |
+| `--orbit-min`         | Minimum orbit number (default: **0**).                           |
+| `--orbit-max`         | Maximum orbit number (default: infinite).                        |
+| `-o`, `--output-path` | Directory to save downloaded files (default: current directory). |
+| `--max-workers`       | Maximum number of concurrent downloads (default: **5**).         |
 | `--show`              | Show filenames before downloading.                               |
 | `--unzip`             | Automatically unzip downloaded files.                            |
-| `--disable_progress`  | Hide progress bars during download.                              |
-| `--no_prompt`         | Skip confirmation prompt before downloading.                     |
+| `--disable-progress`  | Hide progress bars during download.                              |
+| `--no-prompt`         | Skip confirmation prompt before downloading.                     |
 | `-h`, `--help`        | Show help message and exit.                                      |
 
 Available products:

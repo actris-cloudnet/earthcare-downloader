@@ -41,14 +41,14 @@ def main():
         help="Distance [km] from the location to search for data (default: 200 km).",
     )
     parser.add_argument(
-        "--max_workers",
+        "--max-workers",
         type=int,
         default=5,
         help="Maximum number of concurrent downloads (default: 5).",
     )
     parser.add_argument(
         "-o",
-        "--output_path",
+        "--output-path",
         type=str,
         default=Path("."),
         help="Output directory for downloaded files (default: current directory).",
@@ -78,25 +78,25 @@ def main():
         default=False,
     )
     parser.add_argument(
-        "--orbit_min",
+        "--orbit-min",
         type=int,
         help="Minimum orbit number.",
         default=0,
     )
     parser.add_argument(
-        "--orbit_max",
+        "--orbit-max",
         type=int,
         help="Maximum orbit number.",
         default=1_000_000_000,
     )
     parser.add_argument(
-        "--disable_progress",
+        "--disable-progress",
         action="store_true",
         help="Disable progress bars during download.",
         default=False,
     )
     parser.add_argument(
-        "--no_prompt",
+        "--no-prompt",
         action="store_true",
         help="Disable prompt for confirmation before downloading files.",
         default=False,
@@ -104,7 +104,7 @@ def main():
 
     args = parser.parse_args()
 
-    params = SearchParams(
+    search_params = SearchParams(
         lat=args.lat,
         lon=args.lon,
         distance=args.distance,
@@ -126,7 +126,7 @@ def main():
 
     asyncio.run(
         dl.download_overpass_data(
-            params,
+            search_params,
             task_params,
         )
     )
