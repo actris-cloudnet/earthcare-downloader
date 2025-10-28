@@ -18,13 +18,13 @@ python3 -m pip install earthcare-downloader
 Store your [ESA EO Sign In](https://eoiam-idp.eo.esa.int/) credentials in the environment variables `ESA_EO_USERNAME` and `ESA_EO_PASSWORD`.
 If these variables are not set, the program will prompt you to enter your credentials.
 
-### Running the tool
+### Running the program
 
 ```
-earthcare-downloader --lat LAT --lon LON -p PRODUCT [options]
+earthcare-downloader -p PRODUCT --lat LAT --lon LON [options]
 ```
 
-where options are:
+where the arguments are:
 
 | Argument              | Description                                                      |
 | --------------------- | ---------------------------------------------------------------- |
@@ -35,7 +35,7 @@ where options are:
 | `-d`, `--distance`    | Search radius around the location in km (default: **200**).      |
 | `--start`             | Start date (YYYY-MM-DD).                                         |
 | `--stop`              | Stop date (YYYY-MM-DD).                                          |
-| `--orbit_min`         | Minimum orbit number (default: 0).                               |
+| `--orbit_min`         | Minimum orbit number (default: **0**).                           |
 | `--orbit_max`         | Maximum orbit number (default: infinite).                        |
 | `-o`, `--output_path` | Directory to save downloaded files (default: current directory). |
 | `--max_workers`       | Maximum number of concurrent downloads (default: **5**).         |
@@ -44,7 +44,7 @@ where options are:
 | `--disable_progress`  | Hide progress bars during download.                              |
 | `--no_prompt`         | Skip confirmation prompt before downloading.                     |
 
-Available products:
+Available products (see [documentation](https://earthcarehandbook.earth.esa.int/catalogue/index)):
 
 | Level        | Product Code   | Description                                      |
 | ------------ | -------------- | ------------------------------------------------ |
