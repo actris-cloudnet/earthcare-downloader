@@ -90,7 +90,7 @@ You can also use earthcare-downloader as a Python library:
 from earthcare_downloader import search, download
 
 urls = search(product="CPR_TC__2A", lat=61.844, lon=24.287, distance=5)
-paths = download(urls, output_path="data/" unzip=True)
+paths = download(urls, output_path="data/", unzip=True)
 ```
 
 When working in notebooks, use the asynchronous versions of these functions:
@@ -99,7 +99,7 @@ When working in notebooks, use the asynchronous versions of these functions:
 from earthcare_downloader.aio import search, download
 
 urls = await search(product="CPR_TC__2A", lat=61.844, lon=24.287, distance=5)
-paths = await download(urls, output_path="data/" unzip=True, disable_progress=True)
+paths = await download(urls, output_path="data/", unzip=True, disable_progress=True)
 ```
 
 ## License
