@@ -1,9 +1,9 @@
-# earthcare-downloader
+# <img src="logo.png" width="35px"> earthcare-downloader
 
 [![CI](https://github.com/actris-cloudnet/earthcare-downloader/actions/workflows/test.yml/badge.svg)](https://github.com/actris-cloudnet/earthcare-downloader/actions/workflows/test.yml)
 [![PyPI version](https://badge.fury.io/py/earthcare-downloader.svg)](https://badge.fury.io/py/earthcare-downloader)
 
-A command-line tool for downloading [EarthCARE](https://earth.esa.int/eogateway/missions/earthcare) satellite data
+A Python tool for downloading [EarthCARE](https://earth.esa.int/eogateway/missions/earthcare) satellite data
 
 ## Installation
 
@@ -18,7 +18,7 @@ python3 -m pip install earthcare-downloader
 Store your [ESA EO Sign In](https://eoiam-idp.eo.esa.int/) credentials in the environment variables `ESA_EO_USERNAME` and `ESA_EO_PASSWORD`.
 If these variables are not set, the program will prompt you to enter your credentials.
 
-### Running the program
+### Command Line Interface
 
 ```
 earthcare-downloader -p PRODUCT --lat LAT --lon LON [options]
@@ -74,7 +74,7 @@ Available products:
 |              | [AM\_\_CTH_2B](https://earthcarehandbook.earth.esa.int/catalogue/am__cth_2b)   | ATLID-MSI Cloud Top Height                       |
 |              | [BM\_\_RAD_2B](https://earthcarehandbook.earth.esa.int/catalogue/bm__rad_2b)   | BBR-MSI Radiative Fluxes and Heating Rates       |
 
-## Examples
+### Examples
 
 Download all `CPR_TC__2A` overpass data within 5 km of Hyytiälä, Finland:
 
