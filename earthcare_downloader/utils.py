@@ -2,6 +2,10 @@ import datetime
 import math
 from dataclasses import dataclass
 from pathlib import Path
+from typing import Final
+
+MISSION_START: Final = datetime.date(2024, 5, 28)
+MAX_ORBITS: Final = 1_000_000_000
 
 
 @dataclass
@@ -32,3 +36,19 @@ def distance_to_lat_deg(distance: float) -> float:
 
 def distance_to_lon_deg(lat: float, distance: float) -> float:
     return round(distance / (111.32 * math.cos(math.radians(lat))), 3)
+
+
+def utcnow() -> datetime.datetime:
+    return datetime.datetime.now(tz=datetime.timezone.utc)
+
+
+def today() -> datetime.date:
+    return utcnow().date()
+
+
+def str2date(date_str: str) -> datetime.date:
+    return datetime.datetime.strptime(date_str, "%Y-%m-%d").date()
+
+
+def dt2str(dt: datetime.datetime) -> str:
+    return dt.date().isoformat()

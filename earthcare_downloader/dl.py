@@ -95,17 +95,18 @@ class DlParams:
 async def download_files(
     urls: list[str],
     task_params: TaskParams,
+    credentials: tuple[str, str] | None = None,
 ) -> list[Path]:
     full_paths = []
 
-    session = await _init_session(urls[0])
+    session = await _init_session(urls[0], credentials)
     semaphore = asyncio.Semaphore(task_params.max_workers)
     bar_config = BarConfig(len(urls), task_params)
 
     async with session:
         tasks = []
         for url in urls:
-            destination = task_params.output_path / url.split("/")[-1]
+            destination = Path(task_params.output_path) / Path(url.split("/")[-1])
 
             dl_stuff = DlParams(
                 url=url,
@@ -185,7 +186,9 @@ async def _download_file(
     params.bar_config.overall.update(1)
 
 
-async def _init_session(test_url: str) -> aiohttp.ClientSession:
+async def _init_session(
+    test_url: str, credentials: tuple[str, str] | None
+) -> aiohttp.ClientSession:
     session = aiohttp.ClientSession()
     if COOKIE_PATH.exists():
         with COOKIE_PATH.open("rb") as f:
@@ -198,7 +201,7 @@ async def _init_session(test_url: str) -> aiohttp.ClientSession:
             if "login" in res_url or res.status in {401, 403} or "samlsso" in res_url:
                 logging.warning("Session expired or not authenticated. Logging in...")
                 login_url = f"{test_url.split('data')[0]}access/login"
-                await _authenticate_session(session, login_url)
+                await _authenticate_session(session, login_url, credentials)
                 with COOKIE_PATH.open("wb") as f:
                     if not isinstance(session.cookie_jar, aiohttp.CookieJar):
                         raise RuntimeError("Bad cookies!")
@@ -209,8 +212,10 @@ async def _init_session(test_url: str) -> aiohttp.ClientSession:
     return session
 
 
-async def _authenticate_session(session: aiohttp.ClientSession, login_url: str) -> None:
-    credentials = _get_credentials()
+async def _authenticate_session(
+    session: aiohttp.ClientSession, login_url: str, credentials: tuple[str, str] | None
+) -> None:
+    credentials = credentials or _get_credentials()
     async with session.get(login_url, auth=aiohttp.BasicAuth(*credentials)) as res:
         res.raise_for_status()
         text = await res.text()

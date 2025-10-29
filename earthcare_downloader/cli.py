@@ -1,12 +1,12 @@
 import argparse
 import asyncio
-import datetime
 import logging
 from pathlib import Path
 
 from earthcare_downloader import dl
 from earthcare_downloader.metadata import Prod
 
+from . import utils
 from .utils import SearchParams, TaskParams
 
 
@@ -61,15 +61,15 @@ def main():
     )
     parser.add_argument(
         "--start",
-        type=lambda s: datetime.datetime.strptime(s, "%Y-%m-%d").date(),
+        type=lambda s: utils.str2date(s),
         help="Start date (inclusive) for data search in YYYY-MM-DD format.",
-        default=datetime.date(2024, 5, 28),
+        default=utils.MISSION_START,
     )
     parser.add_argument(
         "--stop",
-        type=lambda s: datetime.datetime.strptime(s, "%Y-%m-%d").date(),
+        type=lambda s: utils.str2date(s),
         help="Stop date (inclusive) for data search in YYYY-MM-DD format.",
-        default=datetime.date.today(),
+        default=utils.today(),
     )
     parser.add_argument(
         "--unzip",
@@ -87,7 +87,7 @@ def main():
         "--orbit-max",
         type=int,
         help="Maximum orbit number.",
-        default=1_000_000_000,
+        default=None,
     )
     parser.add_argument(
         "--disable-progress",
@@ -112,7 +112,7 @@ def main():
         start=args.start,
         stop=args.stop,
         orbit_min=args.orbit_min,
-        orbit_max=args.orbit_max,
+        orbit_max=args.orbit_max or utils.MAX_ORBITS,
     )
 
     task_params = TaskParams(
