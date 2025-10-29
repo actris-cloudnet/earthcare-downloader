@@ -97,8 +97,6 @@ async def download_files(
     task_params: TaskParams,
     credentials: tuple[str, str] | None = None,
 ) -> list[Path]:
-    full_paths = []
-
     session = await _init_session(urls[0], credentials)
     semaphore = asyncio.Semaphore(task_params.max_workers)
     bar_config = BarConfig(len(urls), task_params)
@@ -116,11 +114,9 @@ async def download_files(
                 bar_config=bar_config,
                 unzip=task_params.unzip,
             )
-
-            full_paths.append(destination)
             task = asyncio.create_task(_download_with_retries(dl_stuff))
             tasks.append(task)
-        await asyncio.gather(*tasks)
+        full_paths = await asyncio.gather(*tasks)
         bar_config.overall.close()
         bar_config.overall.clear()
     return full_paths
@@ -128,7 +124,7 @@ async def download_files(
 
 async def _download_with_retries(
     params: DlParams,
-) -> None:
+) -> Path:
     position = await params.bar_config.position_queue.get()
     try:
         max_retries = 3
@@ -142,9 +138,11 @@ async def _download_with_retries(
                     with zipfile.ZipFile(params.destination, "r") as zip_ref:
                         for file_info in zip_ref.filelist:
                             if file_info.filename.lower().endswith(".h5"):
-                                zip_ref.extract(file_info, params.destination.parent)
+                                filename = zip_ref.extract(
+                                    file_info, params.destination.parent
+                                )
                     params.destination.unlink()
-                return
+                return Path(filename) if params.unzip else params.destination
             except aiohttp.ClientError as e:
                 logging.warning(f"Attempt {attempt} failed for {params.url}: {e}")
                 if attempt == max_retries:
@@ -155,6 +153,7 @@ async def _download_with_retries(
                 await asyncio.sleep(2**attempt)
     finally:
         params.bar_config.position_queue.put_nowait(position)
+    raise RuntimeError("Unreachable code reached.")
 
 
 async def _download_file(
