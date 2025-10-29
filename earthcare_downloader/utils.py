@@ -39,7 +39,7 @@ def distance_to_lon_deg(lat: float, distance: float) -> float:
 
 
 def utcnow() -> datetime.datetime:
-    return datetime.datetime.now(tz=datetime.timezone.utc)
+    return datetime.datetime.now(tz=datetime.UTC)
 
 
 def today() -> datetime.date:

@@ -1,4 +1,4 @@
-from typing import Literal
+from typing import Literal, get_args
 
 import aiohttp
 
@@ -6,7 +6,7 @@ from earthcare_downloader import utils
 
 from .utils import SearchParams
 
-Prod = Literal[
+ESA_Prod = Literal[
     # L1 products
     "ATL_NOM_1B",
     "AUX_JSG_1D",
@@ -36,14 +36,25 @@ Prod = Literal[
     "MSI_COP_2A",
 ]
 
+JAXA_Prod = Literal[
+    "AC__CPL_2B",
+    "ATL_CLA_2A",
+    "CPR_CPL_2A",
+    "CPR_ECO_2Ad",
+    "MSI_CLP_2A",
+]
+
+
+Prod = [ESA_Prod, JAXA_Prod]
+
 
 async def get_files(params: SearchParams) -> list[str]:
+    server = "EarthCARE" if params.product in get_args(ESA_Prod) else "JAXA"
+    level = "2" if "2" in params.product else "1"
+    url = f"https://ec-pdgs-discovery.eo.esa.int/socat/{server}L{level}Validated/search"
+
     lat_buffer = utils.distance_to_lat_deg(params.distance)
     lon_buffer = utils.distance_to_lon_deg(params.lat, params.distance)
-    level = "2" if "2" in params.product else "1"
-    url = (
-        f"https://ec-pdgs-discovery.eo.esa.int/socat/EarthCAREL{level}Validated/search"
-    )
 
     query_params = {
         "service": "SimpleOnlineCatalogue",
