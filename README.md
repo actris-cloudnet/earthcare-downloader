@@ -11,7 +11,7 @@ A Python tool for downloading [EarthCARE](https://earth.esa.int/eogateway/missio
 python3 -m pip install earthcare-downloader
 ```
 
-## CLI Usage
+## :penguin: CLI usage
 
 ### Authentication
 
@@ -82,7 +82,7 @@ Download all `CPR_TC__2A` overpass data within 5 km of Hyytiälä, Finland:
 earthcare-downloader --lat 61.844 --lon 24.287 --distance 5 --product CPR_TC__2A
 ```
 
-## Python API
+## :snake: Python API
 
 You can also use earthcare-downloader as a Python library:
 
