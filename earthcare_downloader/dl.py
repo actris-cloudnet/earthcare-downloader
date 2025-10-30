@@ -54,7 +54,7 @@ class BarConfig:
         return queue
 
 
-async def download_overpass_data(
+async def search_and_download(
     search_params: SearchParams,
     task_params: TaskParams,
 ) -> list[Path]:

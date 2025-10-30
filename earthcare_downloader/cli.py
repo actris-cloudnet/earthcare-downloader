@@ -125,7 +125,7 @@ def main():
     )
 
     asyncio.run(
-        dl.download_overpass_data(
+        dl.search_and_download(
             search_params,
             task_params,
         )
