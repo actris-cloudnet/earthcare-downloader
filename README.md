@@ -62,9 +62,9 @@ Available products:
 |              | [ATL_FM\_\_2A](https://earthcarehandbook.earth.esa.int/catalogue/atl_fm__2a)   | ATLID Feature Mask                               |
 |              | [ATL_ICE_2A](https://earthcarehandbook.earth.esa.int/catalogue/atl_ice_2a)     | ATLID Ice Water Content                          |
 |              | [ATL_TC\_\_2A](https://earthcarehandbook.earth.esa.int/catalogue/ac__tc__2b)   | ATLID Target Classification                      |
-|              | [CPR_CD\_\_2A](https://earthcarehandbook.earth.esa.int/catalogue/cpr_cd__2a)   | CPR Cloud Droplet                                |
+|              | [CPR_CD\_\_2A](https://earthcarehandbook.earth.esa.int/catalogue/cpr_cd__2a)   | CPR Cloud Doppler parameters                     |
 |              | [CPR_CLD_2A](https://earthcarehandbook.earth.esa.int/catalogue/cpr_cld_2a)     | CPR Cloud Parameters                             |
-|              | [CPR_FMR_2A](https://earthcarehandbook.earth.esa.int/catalogue/cpr_fmr_2a)     | CPR Feature Mask and Reflectivity                |
+|              | [CPR_FMR_2A](https://earthcarehandbook.earth.esa.int/catalogue/cpr_fmr_2a)     | CPR Feature Mask and Radar Reflectivity          |
 |              | [CPR_TC\_\_2A](https://earthcarehandbook.earth.esa.int/catalogue/cpr_tc__2a)   | CPR Target Classification                        |
 |              | [MSI_AOT_2A](https://earthcarehandbook.earth.esa.int/catalogue/msi_aot_2a)     | MSI Aerosol Optical Thickness                    |
 |              | [MSI_CM\_\_2A](https://earthcarehandbook.earth.esa.int/catalogue/msi_cm__2a)   | MSI Cloud Mask                                   |
