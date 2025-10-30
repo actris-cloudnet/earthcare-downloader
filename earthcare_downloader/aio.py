@@ -23,7 +23,7 @@ async def search(
         start = utils.str2date(start)
 
     if stop is None:
-        stop = utils.today()
+        stop = utils.utctoday()
     elif isinstance(stop, str):
         stop = utils.str2date(stop)
 

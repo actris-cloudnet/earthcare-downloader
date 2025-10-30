@@ -66,7 +66,7 @@ def main():
         "--stop",
         type=lambda s: utils.str2date(s),
         help="Stop date (inclusive) for data search in YYYY-MM-DD format.",
-        default=utils.today(),
+        default=utils.utctoday(),
     )
     parser.add_argument(
         "--unzip",

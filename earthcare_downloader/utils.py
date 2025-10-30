@@ -43,7 +43,7 @@ def utcnow() -> datetime.datetime:
     return datetime.datetime.now(tz=datetime.timezone.utc)
 
 
-def today() -> datetime.date:
+def utctoday() -> datetime.date:
     return utcnow().date()
 
 
