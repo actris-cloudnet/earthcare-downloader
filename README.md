@@ -37,7 +37,7 @@ where the arguments are:
 | `--orbit`             | Single orbit number. Use instead `--orbit-min` and `--orbit-max`       |
 | `--lat LAT`           | Latitude of the target location (-90..90 degrees).                     |
 | `--lon LON`           | Longitude of the target location (-180..180 degrees).                  |
-| `-d`, `--distance`    | Search radius around the location in km. Use with `--lat` and `--lon`. |
+| `-r`, `--radius`      | Search radius around the location in km. Use with `--lat` and `--lon`. |
 | `-o`, `--output-path` | Directory to save downloaded files (default: current directory).       |
 | `--max-workers`       | Maximum number of concurrent downloads (default: **5**).               |
 | `--show`              | Show filenames before downloading.                                     |
