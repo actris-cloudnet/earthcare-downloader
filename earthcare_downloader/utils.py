@@ -53,3 +53,13 @@ def str2date(date_str: str) -> datetime.date:
 
 def dt2str(dt: datetime.datetime) -> str:
     return dt.date().isoformat()
+
+
+def validate_lat(lat: float | None) -> None:
+    if lat is not None and (lat < -90 or lat > 90):
+        raise ValueError("Latitude must be between -90 and 90 degrees.")
+
+
+def validate_lon(lon: float | None) -> None:
+    if lon is not None and (lon < -180 or lon > 180):
+        raise ValueError("Longitude must be between -180 and 180 degrees.")

@@ -27,11 +27,8 @@ async def search(
     elif isinstance(stop, str):
         stop = utils.str2date(stop)
 
-    if lat is not None and (lat > 90 or lat < -90):
-        raise ValueError("Latitude must be between -90 and 90 degrees.")
-
-    if lon is not None and (lon > 180 or lon < -180):
-        raise ValueError("Longitude must be between -180 and 180 degrees.")
+    utils.validate_lat(lat)
+    utils.validate_lon(lon)
 
     search_params = SearchParams(
         lat=lat,
