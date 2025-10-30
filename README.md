@@ -26,23 +26,23 @@ earthcare-downloader -p PRODUCT [options]
 
 where the arguments are:
 
-| Argument              | Description                                                      |
-| --------------------- | ---------------------------------------------------------------- |
-| `-p`, `--product`     | Product type to download (see full list below).                  |
-| `--lat LAT`           | Latitude of the target location.                                 |
-| `--lon LON`           | Longitude of the target location.                                |
-| `-d`, `--distance`    | Search radius around the location in km (default: **200**).      |
-| `--start`             | Start date (YYYY-MM-DD).                                         |
-| `--stop`              | Stop date (YYYY-MM-DD).                                          |
-| `--orbit-min`         | Minimum orbit number (default: **0**).                           |
-| `--orbit-max`         | Maximum orbit number (default: infinite).                        |
-| `-o`, `--output-path` | Directory to save downloaded files (default: current directory). |
-| `--max-workers`       | Maximum number of concurrent downloads (default: **5**).         |
-| `--show`              | Show filenames before downloading.                               |
-| `--unzip`             | Automatically unzip downloaded files (keeps only .h5 files).     |
-| `--quiet`             | Hide progress bars during download.                              |
-| `--no-prompt`         | Skip confirmation prompt before downloading.                     |
-| `-h`, `--help`        | Show help message and exit.                                      |
+| Argument              | Description                                                            |
+| --------------------- | ---------------------------------------------------------------------- |
+| `-p`, `--product`     | Product type to download (see full list below).                        |
+| `--lat LAT`           | Latitude of the target location.                                       |
+| `--lon LON`           | Longitude of the target location.                                      |
+| `-d`, `--distance`    | Search radius around the location in km. Use with `--lat` and `--lon`. |
+| `--start`             | Start date (YYYY-MM-DD).                                               |
+| `--stop`              | Stop date (YYYY-MM-DD).                                                |
+| `--orbit-min`         | Minimum orbit number.                                                  |
+| `--orbit-max`         | Maximum orbit number.                                                  |
+| `-o`, `--output-path` | Directory to save downloaded files (default: current directory).       |
+| `--max-workers`       | Maximum number of concurrent downloads (default: **5**).               |
+| `--show`              | Show filenames before downloading.                                     |
+| `--unzip`             | Automatically unzip downloaded files (keeps only .h5 files).           |
+| `--quiet`             | Hide progress bars during download.                                    |
+| `--no-prompt`         | Skip confirmation prompt before downloading.                           |
+| `-h`, `--help`        | Show help message and exit.                                            |
 
 Available products:
 

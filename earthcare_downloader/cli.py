@@ -35,8 +35,7 @@ def main():
         "-d",
         "--distance",
         type=float,
-        default=200,
-        help="Distance [km] from the location to search for data (default: 200 km).",
+        help="Distance [km] from the location to search for data.",
     )
     parser.add_argument(
         "--max-workers",
@@ -105,7 +104,7 @@ def main():
     search_params = SearchParams(
         lat=args.lat,
         lon=args.lon,
-        distance=args.distance,
+        distance=args.distance or utils.EARTH_HALF_CIRCUMFERENCE,
         product=args.product,
         start=args.start,
         stop=args.stop,

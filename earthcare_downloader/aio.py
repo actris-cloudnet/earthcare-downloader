@@ -11,7 +11,7 @@ async def search(
     product: str,
     lat: float | None = None,
     lon: float | None = None,
-    distance: float = 200,
+    distance: float | None = None,
     orbit_min: int = 0,
     orbit_max: int | None = None,
     start: str | datetime.date | None = None,
@@ -30,7 +30,7 @@ async def search(
     search_params = SearchParams(
         lat=lat,
         lon=lon,
-        distance=distance,
+        distance=distance or utils.EARTH_HALF_CIRCUMFERENCE,
         product=product,
         start=start,
         stop=stop,

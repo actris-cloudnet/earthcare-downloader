@@ -55,7 +55,11 @@ async def get_files(params: SearchParams) -> list[str]:
         "query.orbitNumber.min": params.orbit_min,
         "query.orbitNumber.max": params.orbit_max,
     }
-    if params.lat is not None and params.lon is not None:
+    if (
+        params.lat is not None
+        and params.lon is not None
+        and params.distance is not None
+    ):
         lat_buffer = utils.distance_to_lat_deg(params.distance)
         lon_buffer = utils.distance_to_lon_deg(params.lat, params.distance)
         query_params["query.footprint.minlat"] = params.lat - lat_buffer

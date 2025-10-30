@@ -6,6 +6,7 @@ from typing import Final
 
 MISSION_START: Final = datetime.date(2024, 5, 28)
 MAX_ORBITS: Final = 1_000_000_000
+EARTH_HALF_CIRCUMFERENCE: Final = 20040
 
 
 @dataclass

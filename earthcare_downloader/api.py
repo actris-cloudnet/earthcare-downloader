@@ -9,7 +9,7 @@ def search(
     product: str,
     lat: float | None = None,
     lon: float | None = None,
-    distance: float = 200,
+    distance: float | None = None,
     orbit_min: int = 0,
     orbit_max: int | None = None,
     start: str | datetime.date | None = None,
@@ -21,7 +21,7 @@ def search(
         product: Product type to search for.
         lat: Latitude of the center point.
         lon: Longitude of the center point.
-        distance: Search radius in kilometers. Default is 200 km.
+        distance: Search radius in kilometers. Default is whole Earth.
         orbit_min: Minimum orbit number. Default is 0.
         orbit_max: Maximum orbit number. Default is None (no limit).
         start: Start date (inclusive) for data search. Default is mission start date.
