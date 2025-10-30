@@ -98,8 +98,8 @@ You can also use `earthcare-downloader` as a Python library:
 ```python
 from earthcare_downloader import search, download
 
-urls = search(product="CPR_TC__2A", date="2025-01-01")
-paths = download(urls, unzip=True)
+files = search(product="CPR_TC__2A", date="2025-01-01")
+paths = download(files, unzip=True)
 ```
 
 When working in notebooks, use the asynchronous versions of these functions:
