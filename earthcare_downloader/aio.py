@@ -45,7 +45,7 @@ async def download(
     output_path: str | Path = Path("."),
     unzip: bool = False,
     max_workers: int = 5,
-    quiet: bool = False,
+    quiet: bool = True,
     credentials: tuple[str, str] | None = None,
 ) -> list[Path]:
     if isinstance(output_path, str):

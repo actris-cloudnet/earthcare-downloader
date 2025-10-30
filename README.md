@@ -99,7 +99,7 @@ When working in notebooks, use the asynchronous versions of these functions:
 from earthcare_downloader.aio import search, download
 
 urls = await search(product="CPR_TC__2A", lat=61.844, lon=24.287, distance=5)
-paths = await download(urls, output_path="data/", unzip=True, quiet=True)
+paths = await download(urls, output_path="data/", unzip=True)
 ```
 
 ## License
