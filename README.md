@@ -28,7 +28,7 @@ where the arguments are:
 
 | Argument              | Description                                                            |
 | --------------------- | ---------------------------------------------------------------------- |
-| `-p`, `--product`     | Product type to download (see full list below).                        |
+| `-p`, `--product`     | Product type(s) to download (see full list below).                     |
 | `--lat LAT`           | Latitude of the target location (-90..90 degrees).                     |
 | `--lon LON`           | Longitude of the target location (-180..180 degrees).                  |
 | `-d`, `--distance`    | Search radius around the location in km. Use with `--lat` and `--lon`. |
@@ -79,7 +79,13 @@ Available products:
 Download all `CPR_TC__2A` overpass data within 5 km of Hyytiälä, Finland:
 
 ```bash
-earthcare-downloader --lat 61.844 --lon 24.287 --distance 5 --product CPR_TC__2A
+earthcare-downloader -p CPR_TC__2A --lat 61.844 --lon 24.287 -d 5
+```
+
+Download all `ATL_ALD_2A` and `AUX_JSG_1D` data from two days:
+
+```bash
+earthcare-downloader -p ATL_ALD_2A,AUX_JSG_1D --start=2025-05-01 --stop=2025-05-02
 ```
 
 ## :snake: Python API
@@ -90,7 +96,7 @@ You can also use `earthcare-downloader` as a Python library:
 from earthcare_downloader import search, download
 
 urls = search(product="CPR_TC__2A", start="2025-01-01", stop="2025-01-02")
-paths = download(urls, output_path="data/", unzip=True)
+paths = download(urls, unzip=True)
 ```
 
 When working in notebooks, use the asynchronous versions of these functions:
@@ -99,7 +105,7 @@ When working in notebooks, use the asynchronous versions of these functions:
 from earthcare_downloader.aio import search, download
 
 urls = await search(product="CPR_TC__2A", start="2025-01-01", stop="2025-01-02")
-paths = await download(urls, output_path="data/", unzip=True)
+paths = await download(urls, unzip=True)
 ```
 
 ## License

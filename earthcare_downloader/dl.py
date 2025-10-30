@@ -191,7 +191,6 @@ async def _init_session(
     if COOKIE_PATH.exists():
         jar.load(COOKIE_PATH)
     session = aiohttp.ClientSession(cookie_jar=jar)
-
     servers = {url.split("/data/")[0] for url in urls}
     for server in servers:
         try:
