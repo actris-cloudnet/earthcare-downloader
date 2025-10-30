@@ -26,7 +26,7 @@ class TaskParams:
     output_path: Path
     unzip: bool
     show: bool
-    disable_progress: bool
+    quiet: bool
     no_prompt: bool
 
 

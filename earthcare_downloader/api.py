@@ -49,7 +49,7 @@ def download(
     output_path: str | Path = Path("."),
     unzip: bool = False,
     max_workers: int = 5,
-    disable_progress: bool = False,
+    quiet: bool = False,
     credentials: tuple[str, str] | None = None,
 ) -> list[Path]:
     """Download EarthCARE data files from the given URLs.
@@ -60,8 +60,7 @@ def download(
             directory.
         unzip: Whether to unzip the downloaded files. Default is False.
         max_workers: Maximum number of concurrent download workers. Default is 5.
-        disable_progress: Whether to disable progress bars during download.
-            Default is False.
+        quiet: Whether to disable progress bars during download. Default is False.
         credentials: Optional tuple of (username, password) for authentication.
 
     Returns:
@@ -74,7 +73,7 @@ def download(
             output_path,
             unzip,
             max_workers,
-            disable_progress,
+            quiet,
             credentials,
         )
     )

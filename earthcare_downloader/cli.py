@@ -90,7 +90,7 @@ def main():
         default=None,
     )
     parser.add_argument(
-        "--disable-progress",
+        "--quiet",
         action="store_true",
         help="Disable progress bars during download.",
         default=False,
@@ -120,7 +120,7 @@ def main():
         output_path=Path(args.output_path),
         unzip=args.unzip,
         show=args.show,
-        disable_progress=args.disable_progress,
+        quiet=args.quiet,
         no_prompt=args.no_prompt,
     )
 

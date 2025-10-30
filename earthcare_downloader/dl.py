@@ -25,7 +25,7 @@ COOKIE_PATH = (
 
 class BarConfig:
     def __init__(self, n_data: int, task_params: TaskParams) -> None:
-        self.disable_progress = task_params.disable_progress
+        self.quiet = task_params.quiet
         self.position_queue = self._init_position_queue(task_params.max_workers)
         self.total_amount = tqdm(
             total=0,
@@ -33,7 +33,7 @@ class BarConfig:
             unit="iB",
             unit_scale=True,
             unit_divisor=1024,
-            disable=self.disable_progress,
+            disable=self.quiet,
             position=0,
             leave=False,
         )
@@ -41,7 +41,7 @@ class BarConfig:
             total=n_data,
             desc="Total file progress",
             unit="file",
-            disable=self.disable_progress,
+            disable=self.quiet,
             position=1,
             colour="green",
             leave=False,
@@ -168,7 +168,7 @@ async def _download_file(
             unit="iB",
             unit_scale=True,
             unit_divisor=1024,
-            disable=params.bar_config.disable_progress,
+            disable=params.bar_config.quiet,
             position=position,
             leave=False,
             colour="cyan",

@@ -39,8 +39,8 @@ where the arguments are:
 | `-o`, `--output-path` | Directory to save downloaded files (default: current directory). |
 | `--max-workers`       | Maximum number of concurrent downloads (default: **5**).         |
 | `--show`              | Show filenames before downloading.                               |
-| `--unzip`             | Automatically unzip downloaded files.                            |
-| `--disable-progress`  | Hide progress bars during download.                              |
+| `--unzip`             | Automatically unzip downloaded files (keeps only .h5 files).     |
+| `--quiet`             | Hide progress bars during download.                              |
 | `--no-prompt`         | Skip confirmation prompt before downloading.                     |
 | `-h`, `--help`        | Show help message and exit.                                      |
 
@@ -99,7 +99,7 @@ When working in notebooks, use the asynchronous versions of these functions:
 from earthcare_downloader.aio import search, download
 
 urls = await search(product="CPR_TC__2A", lat=61.844, lon=24.287, distance=5)
-paths = await download(urls, output_path="data/", unzip=True, disable_progress=True)
+paths = await download(urls, output_path="data/", unzip=True, quiet=True)
 ```
 
 ## License
