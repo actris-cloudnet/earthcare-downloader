@@ -9,13 +9,15 @@ from .params import SearchParams, TaskParams
 
 async def search(
     product: str | list[str],
-    lat: float | None = None,
-    lon: float | None = None,
-    distance: float | None = None,
-    orbit_min: int = 0,
-    orbit_max: int | None = None,
     start: str | datetime.date | None = None,
     stop: str | datetime.date | None = None,
+    date: str | datetime.date | None = None,
+    orbit_min: int = 0,
+    orbit_max: int | None = None,
+    orbit: int | None = None,
+    lat: float | None = None,
+    lon: float | None = None,
+    radius: float | None = None,
 ) -> list[str]:
     if start is None:
         start = utils.MISSION_START
@@ -27,13 +29,23 @@ async def search(
     elif isinstance(stop, str):
         stop = utils.str2date(stop)
 
+    if date is not None:
+        if isinstance(date, str):
+            date = utils.str2date(date)
+        start = date
+        stop = date
+
+    if orbit is not None:
+        orbit_min = orbit
+        orbit_max = orbit
+
     utils.validate_lat(lat)
     utils.validate_lon(lon)
 
     search_params = SearchParams(
         lat=lat,
         lon=lon,
-        distance=distance or utils.EARTH_HALF_CIRCUMFERENCE,
+        distance=radius or utils.EARTH_HALF_CIRCUMFERENCE,
         product=utils.validate_products(product),
         start=start,
         stop=stop,

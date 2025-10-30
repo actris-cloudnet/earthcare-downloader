@@ -31,8 +31,10 @@ where the arguments are:
 | `-p`, `--product`     | Product type(s) to download (see full list below).                     |
 | `--start`             | Start date (YYYY-MM-DD).                                               |
 | `--stop`              | Stop date (YYYY-MM-DD).                                                |
+| `-d`, `--date`        | Single date (YYYY-MM-DD). Use instead `--start` and `--stop`           |
 | `--orbit-min`         | Minimum orbit number.                                                  |
 | `--orbit-max`         | Maximum orbit number.                                                  |
+| `--orbit`             | Single orbit number. Use instead `--orbit-min` and `--orbit-max`       |
 | `--lat LAT`           | Latitude of the target location (-90..90 degrees).                     |
 | `--lon LON`           | Longitude of the target location (-180..180 degrees).                  |
 | `-d`, `--distance`    | Search radius around the location in km. Use with `--lat` and `--lon`. |

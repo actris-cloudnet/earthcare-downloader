@@ -21,42 +21,6 @@ def main():
         required=True,
     )
     parser.add_argument(
-        "--lat",
-        type=float,
-        help="Latitude of the location to download data for.",
-    )
-    parser.add_argument(
-        "--lon",
-        type=float,
-        help="Longitude of the location to download data for.",
-    )
-    parser.add_argument(
-        "-d",
-        "--distance",
-        type=float,
-        help="Distance [km] from the location to search for data. "
-        "Use with --lat and --lon.",
-    )
-    parser.add_argument(
-        "--max-workers",
-        type=int,
-        default=5,
-        help="Maximum number of concurrent downloads (default: 5).",
-    )
-    parser.add_argument(
-        "-o",
-        "--output-path",
-        type=str,
-        default=Path("."),
-        help="Output directory for downloaded files (default: current directory).",
-    )
-    parser.add_argument(
-        "--show",
-        action="store_true",
-        help="Show files that would be downloaded.",
-        default=False,
-    )
-    parser.add_argument(
         "--start",
         type=lambda s: utils.str2date(s),
         help="Start date (inclusive) for data search in YYYY-MM-DD format.",
@@ -69,10 +33,12 @@ def main():
         default=utils.utctoday(),
     )
     parser.add_argument(
-        "--unzip",
-        action="store_true",
-        help="Unzip downloaded files after download. Keeps only .h5 files.",
-        default=False,
+        "-d",
+        "--date",
+        type=lambda s: utils.str2date(s),
+        help="Single date for data search in YYYY-MM-DD format. "
+        "Can be used instead of --start and --stop.",
+        default=None,
     )
     parser.add_argument(
         "--orbit-min",
@@ -85,6 +51,54 @@ def main():
         type=int,
         help="Maximum orbit number.",
         default=None,
+    )
+    parser.add_argument(
+        "--orbit",
+        type=int,
+        help="Single orbit number. Can be used instead of --orbit-min and --orbit-max.",
+        default=None,
+    )
+    parser.add_argument(
+        "--lat",
+        type=float,
+        help="Latitude of the location to download data for.",
+    )
+    parser.add_argument(
+        "--lon",
+        type=float,
+        help="Longitude of the location to download data for.",
+    )
+    parser.add_argument(
+        "-r",
+        "--radius",
+        type=float,
+        help="Distance [km] from the location to search for data. "
+        "Use with --lat and --lon.",
+    )
+    parser.add_argument(
+        "-o",
+        "--output-path",
+        type=str,
+        default=Path("."),
+        help="Output directory for downloaded files (default: current directory).",
+    )
+    parser.add_argument(
+        "--max-workers",
+        type=int,
+        default=5,
+        help="Maximum number of concurrent downloads (default: 5).",
+    )
+    parser.add_argument(
+        "--show",
+        action="store_true",
+        help="Show files that would be downloaded.",
+        default=False,
+    )
+    parser.add_argument(
+        "--unzip",
+        action="store_true",
+        help="Unzip downloaded files after download. Keeps only .h5 files.",
+        default=False,
     )
     parser.add_argument(
         "--quiet",
@@ -104,10 +118,18 @@ def main():
     utils.validate_lat(args.lat)
     utils.validate_lon(args.lon)
 
+    if args.date is not None:
+        args.start = args.date
+        args.stop = args.date
+
+    if args.orbit is not None:
+        args.orbit_min = args.orbit
+        args.orbit_max = args.orbit
+
     search_params = SearchParams(
         lat=args.lat,
         lon=args.lon,
-        distance=args.distance or utils.EARTH_HALF_CIRCUMFERENCE,
+        distance=args.radius or utils.EARTH_HALF_CIRCUMFERENCE,
         product=args.product,
         start=args.start,
         stop=args.stop,
