@@ -60,7 +60,7 @@ Available products:
 |              | [ATL_CTH_2A](https://earthcarehandbook.earth.esa.int/catalogue/am__cth_2b)     | ATLID Cloud Top Height                           |
 |              | [ATL_EBD_2A](https://earthcarehandbook.earth.esa.int/catalogue/atl_ebd_2a)     | ATLID Extinction, Backscatter and Depolarization |
 |              | [ATL_FM\_\_2A](https://earthcarehandbook.earth.esa.int/catalogue/atl_fm__2a)   | ATLID Feature Mask                               |
-|              | [ATL_ICE_2A](https://earthcarehandbook.earth.esa.int/catalogue/atl_ice_2a)     | ATLID Ice Water Content                          |
+|              | [ATL_ICE_2A](https://earthcarehandbook.earth.esa.int/catalogue/atl_ice_2a)     | ATLID Ice Parameters                             |
 |              | [ATL_TC\_\_2A](https://earthcarehandbook.earth.esa.int/catalogue/ac__tc__2b)   | ATLID Target Classification                      |
 |              | [CPR_CD\_\_2A](https://earthcarehandbook.earth.esa.int/catalogue/cpr_cd__2a)   | CPR Cloud Doppler parameters                     |
 |              | [CPR_CLD_2A](https://earthcarehandbook.earth.esa.int/catalogue/cpr_cld_2a)     | CPR Cloud Parameters                             |
