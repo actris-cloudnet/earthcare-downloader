@@ -41,11 +41,8 @@ Prod = Literal[
 async def get_files(params: SearchParams) -> list[str]:
     base_url = "https://ec-pdgs-discovery.eo.esa.int/socat"
 
-    products = (
-        params.product.split(",") if isinstance(params.product, str) else params.product
-    )
-    level1_products = [p for p in products if "1" in p]
-    level2_products = [p for p in products if "2" in p]
+    level1_products = [p for p in params.product if "1" in p]
+    level2_products = [p for p in params.product if "2" in p]
 
     query_params = _get_query_params(params)
 

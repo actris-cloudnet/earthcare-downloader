@@ -34,7 +34,7 @@ async def search(
         lat=lat,
         lon=lon,
         distance=distance or utils.EARTH_HALF_CIRCUMFERENCE,
-        product=product,
+        product=utils.validate_products(product),
         start=start,
         stop=stop,
         orbit_min=orbit_min,

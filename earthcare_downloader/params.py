@@ -8,7 +8,7 @@ class SearchParams:
     lat: float | None
     lon: float | None
     distance: float
-    product: str | list[str]
+    product: list[str]
     start: datetime.date
     stop: datetime.date
     orbit_min: int

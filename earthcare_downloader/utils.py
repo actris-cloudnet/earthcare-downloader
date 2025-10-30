@@ -1,5 +1,6 @@
 import datetime
 import math
+from argparse import ArgumentTypeError
 from typing import Final, get_args
 
 from .metadata import Prod
@@ -35,8 +36,12 @@ def validate_lon(lon: float | None) -> None:
         raise ValueError("Longitude must be between -180 and 180 degrees.")
 
 
-def validate_prod(product: str) -> None:
-    products = product.split(",")
-    for p in products:
-        if p not in get_args(Prod):
-            raise ValueError(f"Invalid product type: {p}")
+def validate_products(products: str | list[str]) -> list[str]:
+    if isinstance(products, str):
+        products = products.split(",")
+
+    input_products = set(products)
+    valid_products = set(get_args(Prod))
+    if invalid_products := (input_products - valid_products):
+        raise ArgumentTypeError("Invalid product types: " + ", ".join(invalid_products))
+    return list(input_products)

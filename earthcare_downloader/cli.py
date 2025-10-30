@@ -16,8 +16,8 @@ def main():
     parser.add_argument(
         "-p",
         "--product",
-        type=str,
-        help=f"Product type to download: {', '.join(Prod.__args__)}",
+        help=f"Product type to download. Choose from: {', '.join(Prod.__args__)}",
+        type=lambda product: utils.validate_products(product),
         required=True,
     )
     parser.add_argument(
@@ -34,7 +34,8 @@ def main():
         "-d",
         "--distance",
         type=float,
-        help="Distance [km] from the location to search for data.",
+        help="Distance [km] from the location to search for data. "
+        "Use with --lat and --lon.",
     )
     parser.add_argument(
         "--max-workers",
@@ -70,7 +71,7 @@ def main():
     parser.add_argument(
         "--unzip",
         action="store_true",
-        help="Unzip downloaded files after download.",
+        help="Unzip downloaded files after download. Keeps only .h5 files.",
         default=False,
     )
     parser.add_argument(
@@ -102,7 +103,6 @@ def main():
 
     utils.validate_lat(args.lat)
     utils.validate_lon(args.lon)
-    utils.validate_prod(args.product)
 
     search_params = SearchParams(
         lat=args.lat,
