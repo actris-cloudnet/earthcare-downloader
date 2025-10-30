@@ -39,20 +39,12 @@ def distance_to_lon_deg(lat: float, distance: float) -> float:
     return round(distance / (111.32 * math.cos(math.radians(lat))), 6)
 
 
-def utcnow() -> datetime.datetime:
-    return datetime.datetime.now(tz=datetime.timezone.utc)
-
-
 def utctoday() -> datetime.date:
-    return utcnow().date()
+    return datetime.datetime.now(tz=datetime.timezone.utc).date()
 
 
 def str2date(date_str: str) -> datetime.date:
     return datetime.datetime.strptime(date_str, "%Y-%m-%d").date()
-
-
-def dt2str(dt: datetime.datetime) -> str:
-    return dt.date().isoformat()
 
 
 def validate_lat(lat: float | None) -> None:
