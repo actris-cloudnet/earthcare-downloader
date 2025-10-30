@@ -84,7 +84,7 @@ earthcare-downloader --lat 61.844 --lon 24.287 --distance 5 --product CPR_TC__2A
 
 ## :snake: Python API
 
-You can also use earthcare-downloader as a Python library:
+You can also use `earthcare-downloader` as a Python library:
 
 ```python
 from earthcare_downloader import search, download
