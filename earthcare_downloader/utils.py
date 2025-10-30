@@ -1,34 +1,12 @@
 import datetime
 import math
-from dataclasses import dataclass
-from pathlib import Path
-from typing import Final
+from typing import Final, get_args
+
+from .metadata import Prod
 
 MISSION_START: Final = datetime.date(2024, 5, 28)
 MAX_ORBITS: Final = 1_000_000_000
 EARTH_HALF_CIRCUMFERENCE: Final = 20040
-
-
-@dataclass
-class SearchParams:
-    lat: float | None
-    lon: float | None
-    distance: float
-    product: str
-    start: datetime.date
-    stop: datetime.date
-    orbit_min: int
-    orbit_max: int
-
-
-@dataclass
-class TaskParams:
-    max_workers: int
-    output_path: Path
-    unzip: bool
-    show: bool
-    quiet: bool
-    no_prompt: bool
 
 
 def distance_to_lat_deg(distance: float) -> float:
@@ -55,3 +33,10 @@ def validate_lat(lat: float | None) -> None:
 def validate_lon(lon: float | None) -> None:
     if lon is not None and (lon < -180 or lon > 180):
         raise ValueError("Longitude must be between -180 and 180 degrees.")
+
+
+def validate_prod(product: str) -> None:
+    products = product.split(",")
+    for p in products:
+        if p not in get_args(Prod):
+            raise ValueError(f"Invalid product type: {p}")

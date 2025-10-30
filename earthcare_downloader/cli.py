@@ -4,10 +4,10 @@ import logging
 from pathlib import Path
 
 from earthcare_downloader import dl
-from earthcare_downloader.metadata import Prod
 
 from . import utils
-from .utils import SearchParams, TaskParams
+from .metadata import Prod
+from .params import SearchParams, TaskParams
 
 
 def main():
@@ -17,8 +17,7 @@ def main():
         "-p",
         "--product",
         type=str,
-        choices=Prod.__args__,
-        help="Product type to download.",
+        help=f"Product type to download: {', '.join(Prod.__args__)}",
         required=True,
     )
     parser.add_argument(
@@ -103,6 +102,7 @@ def main():
 
     utils.validate_lat(args.lat)
     utils.validate_lon(args.lon)
+    utils.validate_prod(args.product)
 
     search_params = SearchParams(
         lat=args.lat,

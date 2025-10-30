@@ -4,11 +4,11 @@ from pathlib import Path
 from . import utils
 from .dl import download_files
 from .metadata import get_files
-from .utils import SearchParams, TaskParams
+from .params import SearchParams, TaskParams
 
 
 async def search(
-    product: str,
+    product: str | list[str],
     lat: float | None = None,
     lon: float | None = None,
     distance: float | None = None,

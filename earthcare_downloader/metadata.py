@@ -1,10 +1,11 @@
+import asyncio
 from typing import Literal
 
 import aiohttp
 
 from earthcare_downloader import utils
 
-from .utils import SearchParams
+from .params import SearchParams
 
 Prod = Literal[
     # L1 products
@@ -38,16 +39,50 @@ Prod = Literal[
 
 
 async def get_files(params: SearchParams) -> list[str]:
-    level = "2" if "2" in params.product else "1"
-    url = (
-        f"https://ec-pdgs-discovery.eo.esa.int/socat/EarthCAREL{level}Validated/search"
+    base_url = "https://ec-pdgs-discovery.eo.esa.int/socat"
+
+    products = (
+        params.product.split(",") if isinstance(params.product, str) else params.product
     )
+    level1_products = [p for p in products if "1" in p]
+    level2_products = [p for p in products if "2" in p]
+
+    query_params = _get_query_params(params)
+
+    async with aiohttp.ClientSession() as session:
+        tasks = []
+        if level1_products:
+            params_lvl1 = query_params.copy()
+            params_lvl1["query.productType"] = level1_products
+            url_lvl1 = f"{base_url}/EarthCAREL1Validated/search"
+            tasks.append(_fetch_files(session, url_lvl1, params_lvl1))
+
+        if level2_products:
+            params_lvl2 = query_params.copy()
+            params_lvl2["query.productType"] = level2_products
+            url_lvl2 = f"{base_url}/EarthCAREL2Validated/search"
+            tasks.append(_fetch_files(session, url_lvl2, params_lvl2))
+
+        results = await asyncio.gather(*tasks, return_exceptions=False)
+
+    return [line for result in results for line in result]
+
+
+async def _fetch_files(
+    session: aiohttp.ClientSession, url: str, query_params: dict
+) -> list[str]:
+    async with session.post(url, data=query_params) as response:
+        response.raise_for_status()
+        text = await response.text()
+        return text.splitlines()
+
+
+def _get_query_params(params: SearchParams) -> dict:
     query_params = {
         "service": "SimpleOnlineCatalogue",
         "version": "1.2",
         "request": "search",
         "format": "text/plain",
-        "query.productType": params.product,
         "query.beginAcquisition.start": params.start,
         "query.endAcquisition.stop": params.stop,
         "query.endAcquisition.start": params.start,
@@ -67,10 +102,4 @@ async def get_files(params: SearchParams) -> list[str]:
         query_params["query.footprint.maxlat"] = min(params.lat + lat_buffer, 90)
         query_params["query.footprint.maxlon"] = min(params.lon + lon_buffer, 180)
 
-    async with (
-        aiohttp.ClientSession() as session,
-        session.post(url, data=query_params) as response,
-    ):
-        response.raise_for_status()
-        text = await response.text()
-        return text.splitlines()
+    return query_params

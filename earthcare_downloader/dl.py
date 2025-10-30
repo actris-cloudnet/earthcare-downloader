@@ -15,7 +15,7 @@ from tqdm import tqdm
 from earthcare_downloader import metadata
 from earthcare_downloader.html_parser import HTMLParser
 
-from .utils import SearchParams, TaskParams
+from .params import SearchParams, TaskParams
 
 FILE_PATH = Path(__file__).resolve().parent
 COOKIE_PATH = (
@@ -97,7 +97,7 @@ async def download_files(
     task_params: TaskParams,
     credentials: tuple[str, str] | None = None,
 ) -> list[Path]:
-    session = await _init_session(urls[0], credentials)
+    session = await _init_session(urls, credentials)
     semaphore = asyncio.Semaphore(task_params.max_workers)
     bar_config = BarConfig(len(urls), task_params)
 
@@ -186,28 +186,32 @@ async def _download_file(
 
 
 async def _init_session(
-    test_url: str, credentials: tuple[str, str] | None
+    urls: list[str], credentials: tuple[str, str] | None
 ) -> aiohttp.ClientSession:
     session = aiohttp.ClientSession()
+
     if COOKIE_PATH.exists():
         with COOKIE_PATH.open("rb") as f:
             if not isinstance(session.cookie_jar, aiohttp.CookieJar):
                 raise RuntimeError("Bad cookies!")
             session.cookie_jar._cookies = pickle.load(f)
-    try:
-        async with session.get(test_url) as res:
-            res_url = str(res.url).lower()
-            if "login" in res_url or res.status in {401, 403} or "samlsso" in res_url:
-                logging.warning("Session expired or not authenticated. Logging in...")
-                login_url = f"{test_url.split('data')[0]}access/login"
-                await _authenticate_session(session, login_url, credentials)
-                with COOKIE_PATH.open("wb") as f:
-                    if not isinstance(session.cookie_jar, aiohttp.CookieJar):
-                        raise RuntimeError("Bad cookies!")
-                    pickle.dump(session.cookie_jar._cookies, f)
-    except Exception:
-        await session.close()
-        raise
+
+    servers = {url.split("/data/")[0] for url in urls}
+    for server in servers:
+        try:
+            async with session.get(server) as res:
+                body = await res.text()
+                if "logout" not in body.lower():
+                    logging.info(f"Logging in to {server}")
+                    login_url = f"{server}/access/login"
+                    await _authenticate_session(session, login_url, credentials)
+                    with COOKIE_PATH.open("wb") as f:
+                        if not isinstance(session.cookie_jar, aiohttp.CookieJar):
+                            raise RuntimeError("Bad cookies!")
+                        pickle.dump(session.cookie_jar._cookies, f)
+        except Exception:
+            await session.close()
+            raise
     return session
 
 

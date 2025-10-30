@@ -6,7 +6,7 @@ from . import aio
 
 
 def search(
-    product: str,
+    product: str | list[str],
     lat: float | None = None,
     lon: float | None = None,
     distance: float | None = None,
