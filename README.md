@@ -29,13 +29,13 @@ where the arguments are:
 | Argument              | Description                                                            |
 | --------------------- | ---------------------------------------------------------------------- |
 | `-p`, `--product`     | Product type(s) to download (see full list below).                     |
-| `--lat LAT`           | Latitude of the target location (-90..90 degrees).                     |
-| `--lon LON`           | Longitude of the target location (-180..180 degrees).                  |
-| `-d`, `--distance`    | Search radius around the location in km. Use with `--lat` and `--lon`. |
 | `--start`             | Start date (YYYY-MM-DD).                                               |
 | `--stop`              | Stop date (YYYY-MM-DD).                                                |
 | `--orbit-min`         | Minimum orbit number.                                                  |
 | `--orbit-max`         | Maximum orbit number.                                                  |
+| `--lat LAT`           | Latitude of the target location (-90..90 degrees).                     |
+| `--lon LON`           | Longitude of the target location (-180..180 degrees).                  |
+| `-d`, `--distance`    | Search radius around the location in km. Use with `--lat` and `--lon`. |
 | `-o`, `--output-path` | Directory to save downloaded files (default: current directory).       |
 | `--max-workers`       | Maximum number of concurrent downloads (default: **5**).               |
 | `--show`              | Show filenames before downloading.                                     |
