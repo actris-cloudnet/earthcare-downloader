@@ -19,7 +19,16 @@ class SearchParams:
 class TaskParams:
     max_workers: int
     output_path: Path
+    by_product: bool
     unzip: bool
     show: bool
     quiet: bool
     no_prompt: bool
+
+
+@dataclass
+class File:
+    url: str
+    product: str
+    filename: str
+    server: str

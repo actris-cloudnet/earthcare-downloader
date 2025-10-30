@@ -5,7 +5,7 @@ import aiohttp
 
 from earthcare_downloader import utils
 
-from .params import SearchParams
+from .params import File, SearchParams
 
 Prod = Literal[
     # L1 products
@@ -38,7 +38,7 @@ Prod = Literal[
 ]
 
 
-async def get_files(params: SearchParams) -> list[str]:
+async def get_files(params: SearchParams) -> list[File]:
     base_url = "https://ec-pdgs-discovery.eo.esa.int/socat"
 
     level1_products = [p for p in params.product if "1" in p]
@@ -62,7 +62,18 @@ async def get_files(params: SearchParams) -> list[str]:
 
         results = await asyncio.gather(*tasks, return_exceptions=False)
 
-    return [line for result in results for line in result]
+    return [
+        File(
+            url=url,
+            product=product,
+            filename=url.split("/")[-1],
+            server=url.split("/data/")[0],
+        )
+        for result in results
+        for url in result
+        for product in params.product
+        if product in url
+    ]
 
 
 async def _fetch_files(

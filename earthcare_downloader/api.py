@@ -2,6 +2,8 @@ import asyncio
 import datetime
 from pathlib import Path
 
+from earthcare_downloader.params import File
+
 from . import aio
 
 
@@ -16,7 +18,7 @@ def search(
     lat: float | None = None,
     lon: float | None = None,
     radius: float | None = None,
-) -> list[str]:
+) -> list[File]:
     """Search for EarthCARE data files matching the given parameters.
 
     Args:
@@ -51,8 +53,9 @@ def search(
 
 
 def download(
-    urls: list[str],
+    urls: list[File],
     output_path: str | Path = Path("."),
+    by_product: bool = False,
     unzip: bool = False,
     max_workers: int = 5,
     quiet: bool = False,
@@ -64,6 +67,8 @@ def download(
         urls: List of URLs to download.
         output_path: Directory to save the downloaded files. Default is current
             directory.
+        by_product: Whether to create subdirectories for each product type.
+            Default is False.
         unzip: Whether to unzip the downloaded files. Default is False.
         max_workers: Maximum number of concurrent download workers. Default is 5.
         quiet: Whether to disable progress bars during download. Default is False.
@@ -77,9 +82,10 @@ def download(
         aio.download(
             urls,
             output_path,
-            unzip,
-            max_workers,
-            quiet,
-            credentials,
+            by_product=by_product,
+            unzip=unzip,
+            max_workers=max_workers,
+            quiet=quiet,
+            credentials=credentials,
         )
     )

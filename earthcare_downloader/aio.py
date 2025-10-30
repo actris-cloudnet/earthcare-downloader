@@ -4,7 +4,7 @@ from pathlib import Path
 from . import utils
 from .dl import download_files
 from .metadata import get_files
-from .params import SearchParams, TaskParams
+from .params import File, SearchParams, TaskParams
 
 
 async def search(
@@ -18,7 +18,7 @@ async def search(
     lat: float | None = None,
     lon: float | None = None,
     radius: float | None = None,
-) -> list[str]:
+) -> list[File]:
     if start is None:
         start = utils.MISSION_START
     elif isinstance(start, str):
@@ -56,25 +56,21 @@ async def search(
 
 
 async def download(
-    urls: list[str],
+    files: list[File],
     output_path: str | Path = Path("."),
+    by_product: bool = False,
     unzip: bool = False,
     max_workers: int = 5,
     quiet: bool = True,
     credentials: tuple[str, str] | None = None,
 ) -> list[Path]:
-    if isinstance(output_path, str):
-        output_path = Path(output_path)
-
-    output_path.mkdir(parents=True, exist_ok=True)
-
     task_params = TaskParams(
         max_workers=max_workers,
-        output_path=output_path,
+        output_path=Path(output_path),
         unzip=unzip,
         quiet=quiet,
         no_prompt=False,
         show=False,
+        by_product=by_product,
     )
-
-    return await download_files(urls, task_params, credentials)
+    return await download_files(files, task_params, credentials)

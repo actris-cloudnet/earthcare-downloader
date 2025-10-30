@@ -83,6 +83,12 @@ def main():
         help="Output directory for downloaded files (default: current directory).",
     )
     parser.add_argument(
+        "--by-product",
+        action="store_true",
+        help="Create subdirectories for each product type.",
+        default=False,
+    )
+    parser.add_argument(
         "--max-workers",
         type=int,
         default=5,
@@ -140,6 +146,7 @@ def main():
     task_params = TaskParams(
         max_workers=args.max_workers,
         output_path=Path(args.output_path),
+        by_product=args.by_product,
         unzip=args.unzip,
         show=args.show,
         quiet=args.quiet,

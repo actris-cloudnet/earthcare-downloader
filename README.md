@@ -39,6 +39,7 @@ where the arguments are:
 | `--lon LON`           | Longitude of the target location (-180..180 degrees).                  |
 | `-r`, `--radius`      | Search radius around the location in km. Use with `--lat` and `--lon`. |
 | `-o`, `--output-path` | Directory to save downloaded files (default: current directory).       |
+| `--by-product`        | Create subdirectories for each product type.                           |
 | `--max-workers`       | Maximum number of concurrent downloads (default: **5**).               |
 | `--show`              | Show filenames before downloading.                                     |
 | `--unzip`             | Automatically unzip downloaded files (keeps only .h5 files).           |
@@ -106,8 +107,8 @@ When working in notebooks, use the asynchronous versions of these functions:
 ```python
 from earthcare_downloader.aio import search, download
 
-urls = await search(product="CPR_TC__2A", date="2025-01-01")
-paths = await download(urls, unzip=True)
+files = await search(product="CPR_TC__2A", date="2025-01-01")
+paths = await download(files, unzip=True)
 ```
 
 ## License

@@ -14,7 +14,7 @@ from tqdm import tqdm
 from earthcare_downloader import metadata
 from earthcare_downloader.html_parser import HTMLParser
 
-from .params import SearchParams, TaskParams
+from .params import File, SearchParams, TaskParams
 
 FILE_PATH = Path(__file__).resolve().parent
 COOKIE_PATH = (
@@ -58,19 +58,19 @@ async def search_and_download(
     search_params: SearchParams,
     task_params: TaskParams,
 ) -> list[Path]:
-    task_params.output_path.mkdir(parents=True, exist_ok=True)
-    urls = await metadata.get_files(search_params)
-    if not urls:
+    files = await metadata.get_files(search_params)
+
+    if not files:
         logging.info("No files found.")
         return []
 
     if task_params.show:
-        for url in urls:
-            logging.info(url)
+        for file in files:
+            logging.info(file.url)
 
     if not task_params.no_prompt:
         confirmed = input(
-            f"Proceed with downloading {len(urls)} files? [y/n]: "
+            f"Proceed with downloading {len(files)} files? [y/n]: "
         ).strip().lower() in ("y", "yes")
     else:
         confirmed = True
@@ -78,7 +78,7 @@ async def search_and_download(
     if not confirmed:
         return []
 
-    return await download_files(urls, task_params)
+    return await download_files(files, task_params)
 
 
 @dataclass
@@ -92,21 +92,27 @@ class DlParams:
 
 
 async def download_files(
-    urls: list[str],
+    files: list[File],
     task_params: TaskParams,
     credentials: tuple[str, str] | None = None,
 ) -> list[Path]:
-    session = await _init_session(urls, credentials)
+    _make_folders(task_params, files)
+
+    session = await _init_session(files, credentials)
     semaphore = asyncio.Semaphore(task_params.max_workers)
-    bar_config = BarConfig(len(urls), task_params)
+    bar_config = BarConfig(len(files), task_params)
 
     async with session:
         tasks = []
-        for url in urls:
-            destination = Path(task_params.output_path) / Path(url.split("/")[-1])
+        for file in files:
+            root = task_params.output_path
+            if task_params.by_product:
+                root /= file.product
+
+            destination = root / Path(file.filename)
 
             dl_stuff = DlParams(
-                url=url,
+                url=file.url,
                 destination=destination,
                 session=session,
                 semaphore=semaphore,
@@ -185,13 +191,13 @@ async def _download_file(
 
 
 async def _init_session(
-    urls: list[str], credentials: tuple[str, str] | None
+    files: list[File], credentials: tuple[str, str] | None
 ) -> aiohttp.ClientSession:
     jar = aiohttp.CookieJar()
     if COOKIE_PATH.exists():
         jar.load(COOKIE_PATH)
     session = aiohttp.ClientSession(cookie_jar=jar)
-    servers = {url.split("/data/")[0] for url in urls}
+    servers = {file.server for file in files}
     for server in servers:
         try:
             async with session.get(server) as res:
@@ -246,3 +252,11 @@ def _get_credentials() -> tuple[str, str]:
         username = input("ESA EO username: ")
         password = getpass("ESA EO password: ")
     return username, password
+
+
+def _make_folders(task_params: TaskParams, files: list[File]) -> None:
+    task_params.output_path.mkdir(parents=True, exist_ok=True)
+    products = {file.product for file in files}
+    if task_params.by_product:
+        for product in products:
+            (task_params.output_path / product).mkdir(exist_ok=True)
