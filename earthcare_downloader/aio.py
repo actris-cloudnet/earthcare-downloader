@@ -9,8 +9,8 @@ from .utils import SearchParams, TaskParams
 
 async def search(
     product: str,
-    lat: float,
-    lon: float,
+    lat: float | None = None,
+    lon: float | None = None,
     distance: float = 200,
     orbit_min: int = 0,
     orbit_max: int | None = None,

@@ -38,22 +38,15 @@ Prod = Literal[
 
 
 async def get_files(params: SearchParams) -> list[str]:
-    lat_buffer = utils.distance_to_lat_deg(params.distance)
-    lon_buffer = utils.distance_to_lon_deg(params.lat, params.distance)
     level = "2" if "2" in params.product else "1"
     url = (
         f"https://ec-pdgs-discovery.eo.esa.int/socat/EarthCAREL{level}Validated/search"
     )
-
     query_params = {
         "service": "SimpleOnlineCatalogue",
         "version": "1.2",
         "request": "search",
         "format": "text/plain",
-        "query.footprint.minlat": params.lat - lat_buffer,
-        "query.footprint.minlon": params.lon - lon_buffer,
-        "query.footprint.maxlat": params.lat + lat_buffer,
-        "query.footprint.maxlon": params.lon + lon_buffer,
         "query.productType": params.product,
         "query.beginAcquisition.start": params.start,
         "query.endAcquisition.stop": params.stop,
@@ -62,6 +55,13 @@ async def get_files(params: SearchParams) -> list[str]:
         "query.orbitNumber.min": params.orbit_min,
         "query.orbitNumber.max": params.orbit_max,
     }
+    if params.lat is not None and params.lon is not None:
+        lat_buffer = utils.distance_to_lat_deg(params.distance)
+        lon_buffer = utils.distance_to_lon_deg(params.lat, params.distance)
+        query_params["query.footprint.minlat"] = params.lat - lat_buffer
+        query_params["query.footprint.minlon"] = params.lon - lon_buffer
+        query_params["query.footprint.maxlat"] = params.lat + lat_buffer
+        query_params["query.footprint.maxlon"] = params.lon + lon_buffer
 
     async with (
         aiohttp.ClientSession() as session,

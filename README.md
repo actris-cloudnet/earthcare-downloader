@@ -21,7 +21,7 @@ If these variables are not set, the program will prompt you to enter your creden
 ### Running the program
 
 ```
-earthcare-downloader -p PRODUCT --lat LAT --lon LON [options]
+earthcare-downloader -p PRODUCT [options]
 ```
 
 where the arguments are:

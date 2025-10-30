@@ -14,24 +14,22 @@ def main():
     logging.basicConfig(level=logging.INFO)
     parser = argparse.ArgumentParser(description="Download EarthCARE satellite data.")
     parser.add_argument(
-        "--lat",
-        type=float,
-        help="Latitude of the location to download data for.",
-        required=True,
-    )
-    parser.add_argument(
-        "--lon",
-        type=float,
-        help="Longitude of the location to download data for.",
-        required=True,
-    )
-    parser.add_argument(
         "-p",
         "--product",
         type=str,
         choices=Prod.__args__,
         help="Product type to download.",
         required=True,
+    )
+    parser.add_argument(
+        "--lat",
+        type=float,
+        help="Latitude of the location to download data for.",
+    )
+    parser.add_argument(
+        "--lon",
+        type=float,
+        help="Longitude of the location to download data for.",
     )
     parser.add_argument(
         "-d",

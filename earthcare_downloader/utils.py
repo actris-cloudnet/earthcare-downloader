@@ -10,10 +10,10 @@ MAX_ORBITS: Final = 1_000_000_000
 
 @dataclass
 class SearchParams:
-    lat: float
-    lon: float
-    product: str
+    lat: float | None
+    lon: float | None
     distance: float
+    product: str
     start: datetime.date
     stop: datetime.date
     orbit_min: int
