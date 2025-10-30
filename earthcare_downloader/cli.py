@@ -101,6 +101,12 @@ def main():
 
     args = parser.parse_args()
 
+    if args.lat > 90 or args.lat < -90:
+        raise ValueError("Latitude must be between -90 and 90 degrees.")
+
+    if args.lon > 180 or args.lon < -180:
+        raise ValueError("Longitude must be between -180 and 180 degrees.")
+
     search_params = SearchParams(
         lat=args.lat,
         lon=args.lon,

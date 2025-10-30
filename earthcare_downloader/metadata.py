@@ -62,10 +62,10 @@ async def get_files(params: SearchParams) -> list[str]:
     ):
         lat_buffer = utils.distance_to_lat_deg(params.distance)
         lon_buffer = utils.distance_to_lon_deg(params.lat, params.distance)
-        query_params["query.footprint.minlat"] = params.lat - lat_buffer
-        query_params["query.footprint.minlon"] = params.lon - lon_buffer
-        query_params["query.footprint.maxlat"] = params.lat + lat_buffer
-        query_params["query.footprint.maxlon"] = params.lon + lon_buffer
+        query_params["query.footprint.minlat"] = max(params.lat - lat_buffer, -90)
+        query_params["query.footprint.minlon"] = max(params.lon - lon_buffer, -180)
+        query_params["query.footprint.maxlat"] = min(params.lat + lat_buffer, 90)
+        query_params["query.footprint.maxlon"] = min(params.lon + lon_buffer, 180)
 
     async with (
         aiohttp.ClientSession() as session,
