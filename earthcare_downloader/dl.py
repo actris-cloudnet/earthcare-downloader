@@ -1,7 +1,6 @@
 import asyncio
 import logging
 import os
-import pickle
 import zipfile
 from contextlib import suppress
 from dataclasses import dataclass
@@ -188,13 +187,10 @@ async def _download_file(
 async def _init_session(
     urls: list[str], credentials: tuple[str, str] | None
 ) -> aiohttp.ClientSession:
-    session = aiohttp.ClientSession()
-
+    jar = aiohttp.CookieJar()
     if COOKIE_PATH.exists():
-        with COOKIE_PATH.open("rb") as f:
-            if not isinstance(session.cookie_jar, aiohttp.CookieJar):
-                raise RuntimeError("Bad cookies!")
-            session.cookie_jar._cookies = pickle.load(f)
+        jar.load(COOKIE_PATH)
+    session = aiohttp.ClientSession(cookie_jar=jar)
 
     servers = {url.split("/data/")[0] for url in urls}
     for server in servers:
@@ -205,10 +201,7 @@ async def _init_session(
                     logging.info(f"Logging in to {server}")
                     login_url = f"{server}/access/login"
                     await _authenticate_session(session, login_url, credentials)
-                    with COOKIE_PATH.open("wb") as f:
-                        if not isinstance(session.cookie_jar, aiohttp.CookieJar):
-                            raise RuntimeError("Bad cookies!")
-                        pickle.dump(session.cookie_jar._cookies, f)
+                    jar.save(COOKIE_PATH)
         except Exception:
             await session.close()
             raise
