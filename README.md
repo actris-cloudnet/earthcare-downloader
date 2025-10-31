@@ -31,10 +31,10 @@ where the arguments are:
 | `-p`, `--product`     | Product type(s) to download (see full list below).                     |
 | `--start`             | Start date (YYYY-MM-DD).                                               |
 | `--stop`              | Stop date (YYYY-MM-DD).                                                |
-| `-d`, `--date`        | Single date (YYYY-MM-DD). Use instead of `--start` and `--stop`        |
+| `-d`, `--date`        | Single date (YYYY-MM-DD). Overrides `--start` and `--stop`             |
 | `--orbit-min`         | Minimum orbit number.                                                  |
 | `--orbit-max`         | Maximum orbit number.                                                  |
-| `--orbit`             | Single orbit number. Use instead of `--orbit-min` and `--orbit-max`    |
+| `--orbit`             | Single orbit number. Overrides `--orbit-min` and `--orbit-max`         |
 | `--lat LAT`           | Latitude of the target location (-90..90 degrees).                     |
 | `--lon LON`           | Longitude of the target location (-180..180 degrees).                  |
 | `-r`, `--radius`      | Search radius around the location in km. Use with `--lat` and `--lon`. |
