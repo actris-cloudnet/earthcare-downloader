@@ -40,26 +40,27 @@ Prod = Literal[
 
 async def get_files(params: SearchParams) -> list[File]:
     base_url = "https://ec-pdgs-discovery.eo.esa.int/socat"
-
-    level1_products = [p for p in params.product if "1" in p]
-    level2_products = [p for p in params.product if "2" in p]
-
     query_params = _get_query_params(params)
 
+    product_groups = {
+        "1": [p for p in params.product if "1" in p],
+        "2": [p for p in params.product if "2" in p],
+    }
+    urls = {
+        "1": f"{base_url}/EarthCAREL1Validated/search",
+        "2": f"{base_url}/EarthCAREL2Validated/search",
+    }
+
     async with aiohttp.ClientSession() as session:
-        tasks = []
-        if level1_products:
-            params_lvl1 = query_params.copy()
-            params_lvl1["query.productType"] = level1_products
-            url_lvl1 = f"{base_url}/EarthCAREL1Validated/search"
-            tasks.append(_fetch_files(session, url_lvl1, params_lvl1))
-
-        if level2_products:
-            params_lvl2 = query_params.copy()
-            params_lvl2["query.productType"] = level2_products
-            url_lvl2 = f"{base_url}/EarthCAREL2Validated/search"
-            tasks.append(_fetch_files(session, url_lvl2, params_lvl2))
-
+        tasks = [
+            _fetch_files(
+                session,
+                urls[level],
+                {**query_params, "query.productType": prods},
+            )
+            for level, prods in product_groups.items()
+            if prods
+        ]
         results = await asyncio.gather(*tasks, return_exceptions=False)
 
     return [
