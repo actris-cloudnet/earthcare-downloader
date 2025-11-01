@@ -2,13 +2,13 @@ import asyncio
 import datetime
 from pathlib import Path
 
-from earthcare_downloader.params import File
-
 from . import aio
+from .params import File
+from .products import Product
 
 
 def search(
-    product: str | list[str],
+    product: Product | list[Product],
     start: str | datetime.date | None = None,
     stop: str | datetime.date | None = None,
     date: str | datetime.date | None = None,

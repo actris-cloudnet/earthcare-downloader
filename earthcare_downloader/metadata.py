@@ -1,41 +1,11 @@
 import asyncio
-from typing import Literal
 
 import aiohttp
 
 from earthcare_downloader import utils
 
 from .params import File, SearchParams
-
-Prod = Literal[
-    # L1 products
-    "ATL_NOM_1B",
-    "AUX_JSG_1D",
-    "BBR_NOM_1B",
-    "BBR_SNG_1B",
-    "CPR_NOM_1B",
-    "MSI_NOM_1B",
-    "MSI_RGR_1C",
-    # L2 products
-    "AC__TC__2B",
-    "AM__ACD_2B",
-    "AM__CTH_2B",
-    "ATL_ARE_2A",
-    "ATL_ALD_2A",
-    "ATL_CTH_2A",
-    "ATL_EBD_2A",
-    "ATL_FM__2A",
-    "ATL_ICE_2A",
-    "ATL_TC__2A",
-    "BM__RAD_2B",
-    "CPR_CD__2A",
-    "CPR_CLD_2A",
-    "CPR_FMR_2A",
-    "CPR_TC__2A",
-    "MSI_AOT_2A",
-    "MSI_CM__2A",
-    "MSI_COP_2A",
-]
+from .products import ESAProd, JAXAProd
 
 
 async def get_files(params: SearchParams) -> list[File]:
@@ -43,12 +13,14 @@ async def get_files(params: SearchParams) -> list[File]:
     query_params = _get_query_params(params)
 
     product_groups = {
-        "1": [p for p in params.product if "1" in p],
-        "2": [p for p in params.product if "2" in p],
+        "esa-lv1": [p for p in params.product if p in ESAProd and "1" in p],
+        "esa-lv2": [p for p in params.product if p in ESAProd and "2" in p],
+        "jaxa-lv2": [p for p in params.product if p in JAXAProd],
     }
     urls = {
-        "1": f"{base_url}/EarthCAREL1Validated/search",
-        "2": f"{base_url}/EarthCAREL2Validated/search",
+        "esa-lv1": f"{base_url}/EarthCAREL1Validated/search",
+        "esa-lv2": f"{base_url}/EarthCAREL2Validated/search",
+        "jaxa-lv2": f"{base_url}/JAXAL2Validated/search",
     }
 
     async with aiohttp.ClientSession() as session:

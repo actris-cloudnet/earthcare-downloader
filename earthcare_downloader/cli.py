@@ -6,8 +6,8 @@ from pathlib import Path
 from earthcare_downloader import dl
 
 from . import utils
-from .metadata import Prod
 from .params import SearchParams, TaskParams
+from .products import VALID_PRODUCTS
 
 
 def main():
@@ -16,7 +16,7 @@ def main():
     parser.add_argument(
         "-p",
         "--product",
-        help=f"Product type to download. Choose from: {', '.join(Prod.__args__)}",
+        help=f"Product type to download. Choose from: {', '.join(VALID_PRODUCTS)}.",
         type=lambda product: utils.validate_products(product),
         required=True,
     )

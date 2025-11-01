@@ -1,9 +1,9 @@
 import datetime
 import math
 from argparse import ArgumentTypeError
-from typing import Final, get_args
+from typing import Final
 
-from .metadata import Prod
+from .products import VALID_PRODUCTS, Product
 
 MISSION_START: Final = datetime.date(2024, 5, 28)
 MAX_ORBITS: Final = 1_000_000_000
@@ -19,7 +19,7 @@ def distance_to_lon_deg(lat: float, distance: float) -> float:
 
 
 def utctoday() -> datetime.date:
-    return datetime.datetime.now(tz=datetime.timezone.utc).date()
+    return datetime.datetime.now(tz=datetime.UTC).date()
 
 
 def str2date(date_str: str) -> datetime.date:
@@ -36,12 +36,14 @@ def validate_lon(lon: float | None) -> None:
         raise ValueError("Longitude must be between -180 and 180 degrees.")
 
 
-def validate_products(products: str | list[str]) -> list[str]:
+def validate_products(products: str | list[Product]) -> list[str]:
     if isinstance(products, str):
-        products = products.split(",")
+        raw_products = products.split(",")
+    else:
+        raw_products = [p.value for p in products]
 
-    input_products = set(products)
-    valid_products = set(get_args(Prod))
-    if invalid_products := (input_products - valid_products):
-        raise ArgumentTypeError("Invalid product types: " + ", ".join(invalid_products))
+    input_products = set(raw_products)
+    if invalid_products := (input_products - VALID_PRODUCTS):
+        msg = f"Invalid product types: {', '.join(invalid_products)}."
+        raise ArgumentTypeError(msg)
     return list(input_products)
