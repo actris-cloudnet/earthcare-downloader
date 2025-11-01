@@ -53,7 +53,7 @@ def search(
 
 
 def download(
-    urls: list[File],
+    files: list[File],
     output_path: str | Path = Path("."),
     by_product: bool = False,
     unzip: bool = False,
@@ -64,7 +64,7 @@ def download(
     """Download EarthCARE data files from the given URLs.
 
     Args:
-        urls: List of URLs to download.
+        files: List of URLs to download.
         output_path: Directory to save the downloaded files. Default is current
             directory.
         by_product: Whether to create subdirectories for each product type.
@@ -80,8 +80,8 @@ def download(
     """
     return asyncio.run(
         aio.download(
-            urls,
-            output_path,
+            files=files,
+            output_path=output_path,
             by_product=by_product,
             unzip=unzip,
             max_workers=max_workers,
