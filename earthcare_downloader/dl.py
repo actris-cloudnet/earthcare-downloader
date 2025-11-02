@@ -124,12 +124,13 @@ async def download_files(
         full_paths = await asyncio.gather(*tasks)
         bar_config.overall.close()
         bar_config.overall.clear()
-    return full_paths
+
+    return [path for paths in full_paths for path in paths]
 
 
 async def _download_with_retries(
     params: DlParams,
-) -> Path:
+) -> list[Path]:
     position = await params.bar_config.position_queue.get()
     try:
         max_retries = 3
@@ -140,14 +141,14 @@ async def _download_with_retries(
                     position,
                 )
                 if params.unzip and params.destination.suffix.lower() == ".zip":
-                    with zipfile.ZipFile(params.destination, "r") as zip_ref:
-                        for file_info in zip_ref.filelist:
-                            if file_info.filename.lower().endswith(".h5"):
-                                filename = zip_ref.extract(
-                                    file_info, params.destination.parent
-                                )
+                    with zipfile.ZipFile(params.destination) as zf:
+                        extracted = [
+                            Path(zf.extract(f, params.destination.parent))
+                            for f in zf.filelist
+                        ]
                     params.destination.unlink()
-                return Path(filename) if params.unzip else params.destination
+                    return extracted
+                return [params.destination]
             except aiohttp.ClientError as e:
                 logging.warning(f"Attempt {attempt} failed for {params.url}: {e}")
                 if attempt == max_retries:
