@@ -103,7 +103,7 @@ def main():
     parser.add_argument(
         "--unzip",
         action="store_true",
-        help="Unzip downloaded files after download. Keeps only .h5 files.",
+        help="Unzip downloaded files after download.",
         default=False,
     )
     parser.add_argument(

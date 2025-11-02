@@ -42,7 +42,7 @@ where the arguments are:
 | `--by-product`        | Create subdirectories for each product type.                           |
 | `--max-workers`       | Maximum number of concurrent downloads (default: **5**).               |
 | `--show`              | Show filenames before downloading.                                     |
-| `--unzip`             | Automatically unzip downloaded files (keeps only .h5 files).           |
+| `--unzip`             | Automatically unzip downloaded files.                                  |
 | `--quiet`             | Hide progress bars during download.                                    |
 | `--no-prompt`         | Skip confirmation prompt before downloading.                           |
 | `-h`, `--help`        | Show help message and exit.                                            |
