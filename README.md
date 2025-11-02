@@ -74,7 +74,7 @@ Available products:
 |              | [MSI_COP_2A](https://earthcarehandbook.earth.esa.int/catalogue/msi_cop_2a)     | MSI Cloud Optical Properties                     |
 |              | \*[ATL_CLA_2A](https://eolp.jaxa.jp/EarthCARE_ATLID_L2A_ATL_CLA.html)          | ATLID Cloud and Aerosol Classification           |
 |              | \*[CPR_CLP_2A](https://eolp.jaxa.jp/EarthCARE_CPR_L2A_CPR_CLP.html)            | CPR Cloud Properties                             |
-|              | \*[CPR_CLP_2A](https://eolp.jaxa.jp/EarthCARE_CPR_L2A_CPR_ECO.html)            | CPR Echo Characteristics                         |
+|              | \*[CPR_ECO_2A](https://eolp.jaxa.jp/EarthCARE_CPR_L2A_CPR_ECO.html)            | CPR Echo Characteristics                         |
 |              | \*[MSI_CLP_2A](https://eolp.jaxa.jp/EarthCARE_MSI_L2A_MSI_CLP.html)            | MSI Cloud Properties                             |
 | **Level 2B** | [AC\_\_TC\_\_2B](https://earthcarehandbook.earth.esa.int/catalogue/ac__tc__2b) | ATLID-CPR Target Classification                  |
 |              | [AM\_\_ACD_2B](https://earthcarehandbook.earth.esa.int/catalogue/am__acd_2b)   | ATLID-MSI Aerosol Column Descriptors             |
