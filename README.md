@@ -83,6 +83,9 @@ Available products:
 |                                                     | [AM\_\_CTH_2B](https://earthcarehandbook.earth.esa.int/catalogue/am__cth_2b)   | ATLID-MSI Cloud Top Height                       |
 |                                                     | [BM\_\_RAD_2B](https://earthcarehandbook.earth.esa.int/catalogue/bm__rad_2b)   | BBR-MSI Radiative Fluxes and Heating Rates       |
 | <span title="JAXA product">:japanese_castle:</span> | [AC\_\_CLP_2B](https://eolp.jaxa.jp/EarthCARE_L2B_AC__CLP.html)                | CPR-ATLID Synergy Cloud Properties               |
+|                   **Orbit Data**                    |                                                                                |                                                  |
+|                                                     | [AUX_ORBPRE](https://earthcarehandbook.earth.esa.int/catalogue/aux_orbpre)     | Orbit Predictions                                |
+|                                                     | [MPL_ORBSCT](https://earthcarehandbook.earth.esa.int/catalogue/mpl_orbsct)     | Orbit Scenario                                   |
 
 <span title="JAXA product">:japanese_castle:</span> = [JAXA](https://www.eorc.jaxa.jp/EARTHCARE/) product
 

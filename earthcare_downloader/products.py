@@ -39,6 +39,15 @@ class JAXAProd(str, Enum):
     MSI_CLP_2A = "MSI_CLP_2A"
 
 
-Product = ESAProd | JAXAProd
+class OrbitData(str, Enum):
+    AUX_ORBPRE = "AUX_ORBPRE"
+    MPL_ORBSCT = "MPL_ORBSCT"
 
-VALID_PRODUCTS = {e.value for e in ESAProd} | {e.value for e in JAXAProd}
+
+Product = ESAProd | JAXAProd | OrbitData
+
+VALID_PRODUCTS = (
+    {e.value for e in ESAProd}
+    | {e.value for e in JAXAProd}
+    | {e.value for e in OrbitData}
+)
