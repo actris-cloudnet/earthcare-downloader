@@ -49,42 +49,42 @@ where the arguments are:
 
 Available products:
 
-| **Level 1**                                 | Product Code                                                                   | Description                                      |
-| ------------------------------------------- | ------------------------------------------------------------------------------ | ------------------------------------------------ |
-|                                             | [ATL_NOM_1B](https://earthcarehandbook.earth.esa.int/catalogue/atl_nom_1b)     | ATLID Nominal Mode                               |
-|                                             | [AUX_JSG_1D](https://earthcarehandbook.earth.esa.int/catalogue/aux_jsg_1d)     | Auxiliary Joint Standard Grid                    |
-|                                             | [BBR_NOM_1B](https://earthcarehandbook.earth.esa.int/catalogue/bbr_nom_1b)     | Broadband Radiometer Nominal Mode                |
-|                                             | [BBR_SNG_1B](https://earthcarehandbook.earth.esa.int/catalogue/bbr_sng_1b)     | Broadband Radiometer Single View                 |
-|                                             | [CPR_NOM_1B](https://earthcarehandbook.earth.esa.int/catalogue/cpr_nom_1b)     | Cloud Profiling Radar Nominal Mode               |
-|                                             | [MSI_NOM_1B](https://earthcarehandbook.earth.esa.int/catalogue/msi_nom_1b)     | Multi-Spectral Imager Nominal Mode               |
-|                                             | [MSI_RGR_1C](https://earthcarehandbook.earth.esa.int/catalogue/msi_rgr_1c)     | Multi-Spectral Imager Re-Gridded                 |
-| **Level 2A**                                |                                                                                |                                                  |
-|                                             | [ATL_AER_2A](https://earthcarehandbook.earth.esa.int/catalogue/atl_aer_2a)     | ATLID Aerosol Parameters                         |
-|                                             | [ATL_ALD_2A](https://earthcarehandbook.earth.esa.int/catalogue/atl_ald_2a)     | ATLID Aerosol Layer Descriptors                  |
-|                                             | [ATL_CTH_2A](https://earthcarehandbook.earth.esa.int/catalogue/am__cth_2b)     | ATLID Cloud Top Height                           |
-|                                             | [ATL_EBD_2A](https://earthcarehandbook.earth.esa.int/catalogue/atl_ebd_2a)     | ATLID Extinction, Backscatter and Depolarization |
-|                                             | [ATL_FM\_\_2A](https://earthcarehandbook.earth.esa.int/catalogue/atl_fm__2a)   | ATLID Feature Mask                               |
-|                                             | [ATL_ICE_2A](https://earthcarehandbook.earth.esa.int/catalogue/atl_ice_2a)     | ATLID Ice Parameters                             |
-|                                             | [ATL_TC\_\_2A](https://earthcarehandbook.earth.esa.int/catalogue/ac__tc__2b)   | ATLID Target Classification                      |
-|                                             | [CPR_CD\_\_2A](https://earthcarehandbook.earth.esa.int/catalogue/cpr_cd__2a)   | CPR Cloud Doppler parameters                     |
-|                                             | [CPR_CLD_2A](https://earthcarehandbook.earth.esa.int/catalogue/cpr_cld_2a)     | CPR Cloud Parameters                             |
-|                                             | [CPR_FMR_2A](https://earthcarehandbook.earth.esa.int/catalogue/cpr_fmr_2a)     | CPR Feature Mask and Radar Reflectivity          |
-|                                             | [CPR_TC\_\_2A](https://earthcarehandbook.earth.esa.int/catalogue/cpr_tc__2a)   | CPR Target Classification                        |
-|                                             | [MSI_AOT_2A](https://earthcarehandbook.earth.esa.int/catalogue/msi_aot_2a)     | MSI Aerosol Optical Thickness                    |
-|                                             | [MSI_CM\_\_2A](https://earthcarehandbook.earth.esa.int/catalogue/msi_cm__2a)   | MSI Cloud Mask                                   |
-|                                             | [MSI_COP_2A](https://earthcarehandbook.earth.esa.int/catalogue/msi_cop_2a)     | MSI Cloud Optical Properties                     |
-| <div align="center">:japanese_castle:</div> | [ATL_CLA_2A](https://eolp.jaxa.jp/EarthCARE_ATLID_L2A_ATL_CLA.html)            | ATLID Cloud and Aerosol Classification           |
-| <div align="center">:japanese_castle:</div> | [CPR_CLP_2A](https://eolp.jaxa.jp/EarthCARE_CPR_L2A_CPR_CLP.html)              | CPR Cloud Properties                             |
-| <div align="center">:japanese_castle:</div> | [CPR_ECO_2A](https://eolp.jaxa.jp/EarthCARE_CPR_L2A_CPR_ECO.html)              | CPR Echo Characteristics                         |
-| <div align="center">:japanese_castle:</div> | [MSI_CLP_2A](https://eolp.jaxa.jp/EarthCARE_MSI_L2A_MSI_CLP.html)              | MSI Cloud Properties                             |
-| **Level 2B**                                |                                                                                |                                                  |
-|                                             | [AC\_\_TC\_\_2B](https://earthcarehandbook.earth.esa.int/catalogue/ac__tc__2b) | ATLID-CPR Target Classification                  |
-|                                             | [AM\_\_ACD_2B](https://earthcarehandbook.earth.esa.int/catalogue/am__acd_2b)   | ATLID-MSI Aerosol Column Descriptors             |
-|                                             | [AM\_\_CTH_2B](https://earthcarehandbook.earth.esa.int/catalogue/am__cth_2b)   | ATLID-MSI Cloud Top Height                       |
-|                                             | [BM\_\_RAD_2B](https://earthcarehandbook.earth.esa.int/catalogue/bm__rad_2b)   | BBR-MSI Radiative Fluxes and Heating Rates       |
-| <div align="center">:japanese_castle:</div> | [AC\_\_CLP_2B](https://eolp.jaxa.jp/EarthCARE_L2B_AC__CLP.html)                | CPR-ATLID Synergy Cloud Properties               |
+|                     **Level 1**                     | Product Code                                                                   | Description                                      |
+| :-------------------------------------------------: | ------------------------------------------------------------------------------ | ------------------------------------------------ |
+|                                                     | [ATL_NOM_1B](https://earthcarehandbook.earth.esa.int/catalogue/atl_nom_1b)     | ATLID Nominal Mode                               |
+|                                                     | [AUX_JSG_1D](https://earthcarehandbook.earth.esa.int/catalogue/aux_jsg_1d)     | Auxiliary Joint Standard Grid                    |
+|                                                     | [BBR_NOM_1B](https://earthcarehandbook.earth.esa.int/catalogue/bbr_nom_1b)     | Broadband Radiometer Nominal Mode                |
+|                                                     | [BBR_SNG_1B](https://earthcarehandbook.earth.esa.int/catalogue/bbr_sng_1b)     | Broadband Radiometer Single View                 |
+|                                                     | [CPR_NOM_1B](https://earthcarehandbook.earth.esa.int/catalogue/cpr_nom_1b)     | Cloud Profiling Radar Nominal Mode               |
+|                                                     | [MSI_NOM_1B](https://earthcarehandbook.earth.esa.int/catalogue/msi_nom_1b)     | Multi-Spectral Imager Nominal Mode               |
+|                                                     | [MSI_RGR_1C](https://earthcarehandbook.earth.esa.int/catalogue/msi_rgr_1c)     | Multi-Spectral Imager Re-Gridded                 |
+|                    **Level 2A**                     |                                                                                |                                                  |
+|                                                     | [ATL_AER_2A](https://earthcarehandbook.earth.esa.int/catalogue/atl_aer_2a)     | ATLID Aerosol Parameters                         |
+|                                                     | [ATL_ALD_2A](https://earthcarehandbook.earth.esa.int/catalogue/atl_ald_2a)     | ATLID Aerosol Layer Descriptors                  |
+|                                                     | [ATL_CTH_2A](https://earthcarehandbook.earth.esa.int/catalogue/am__cth_2b)     | ATLID Cloud Top Height                           |
+|                                                     | [ATL_EBD_2A](https://earthcarehandbook.earth.esa.int/catalogue/atl_ebd_2a)     | ATLID Extinction, Backscatter and Depolarization |
+|                                                     | [ATL_FM\_\_2A](https://earthcarehandbook.earth.esa.int/catalogue/atl_fm__2a)   | ATLID Feature Mask                               |
+|                                                     | [ATL_ICE_2A](https://earthcarehandbook.earth.esa.int/catalogue/atl_ice_2a)     | ATLID Ice Parameters                             |
+|                                                     | [ATL_TC\_\_2A](https://earthcarehandbook.earth.esa.int/catalogue/ac__tc__2b)   | ATLID Target Classification                      |
+|                                                     | [CPR_CD\_\_2A](https://earthcarehandbook.earth.esa.int/catalogue/cpr_cd__2a)   | CPR Cloud Doppler parameters                     |
+|                                                     | [CPR_CLD_2A](https://earthcarehandbook.earth.esa.int/catalogue/cpr_cld_2a)     | CPR Cloud Parameters                             |
+|                                                     | [CPR_FMR_2A](https://earthcarehandbook.earth.esa.int/catalogue/cpr_fmr_2a)     | CPR Feature Mask and Radar Reflectivity          |
+|                                                     | [CPR_TC\_\_2A](https://earthcarehandbook.earth.esa.int/catalogue/cpr_tc__2a)   | CPR Target Classification                        |
+|                                                     | [MSI_AOT_2A](https://earthcarehandbook.earth.esa.int/catalogue/msi_aot_2a)     | MSI Aerosol Optical Thickness                    |
+|                                                     | [MSI_CM\_\_2A](https://earthcarehandbook.earth.esa.int/catalogue/msi_cm__2a)   | MSI Cloud Mask                                   |
+|                                                     | [MSI_COP_2A](https://earthcarehandbook.earth.esa.int/catalogue/msi_cop_2a)     | MSI Cloud Optical Properties                     |
+| <span title="JAXA product">:japanese_castle:</span> | [ATL_CLA_2A](https://eolp.jaxa.jp/EarthCARE_ATLID_L2A_ATL_CLA.html)            | ATLID Cloud and Aerosol Classification           |
+| <span title="JAXA product">:japanese_castle:</span> | [CPR_CLP_2A](https://eolp.jaxa.jp/EarthCARE_CPR_L2A_CPR_CLP.html)              | CPR Cloud Properties                             |
+| <span title="JAXA product">:japanese_castle:</span> | [CPR_ECO_2A](https://eolp.jaxa.jp/EarthCARE_CPR_L2A_CPR_ECO.html)              | CPR Echo Characteristics                         |
+| <span title="JAXA product">:japanese_castle:</span> | [MSI_CLP_2A](https://eolp.jaxa.jp/EarthCARE_MSI_L2A_MSI_CLP.html)              | MSI Cloud Properties                             |
+|                    **Level 2B**                     |                                                                                |                                                  |
+|                                                     | [AC\_\_TC\_\_2B](https://earthcarehandbook.earth.esa.int/catalogue/ac__tc__2b) | ATLID-CPR Target Classification                  |
+|                                                     | [AM\_\_ACD_2B](https://earthcarehandbook.earth.esa.int/catalogue/am__acd_2b)   | ATLID-MSI Aerosol Column Descriptors             |
+|                                                     | [AM\_\_CTH_2B](https://earthcarehandbook.earth.esa.int/catalogue/am__cth_2b)   | ATLID-MSI Cloud Top Height                       |
+|                                                     | [BM\_\_RAD_2B](https://earthcarehandbook.earth.esa.int/catalogue/bm__rad_2b)   | BBR-MSI Radiative Fluxes and Heating Rates       |
+| <span title="JAXA product">:japanese_castle:</span> | [AC\_\_CLP_2B](https://eolp.jaxa.jp/EarthCARE_L2B_AC__CLP.html)                | CPR-ATLID Synergy Cloud Properties               |
 
-:japanese_castle: = [JAXA](https://www.eorc.jaxa.jp/EARTHCARE/) product
+<span title="JAXA product">:japanese_castle:</span> = [JAXA](https://www.eorc.jaxa.jp/EARTHCARE/) product
 
 ### Examples
 
