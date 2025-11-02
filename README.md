@@ -3,7 +3,7 @@
 [![CI](https://github.com/actris-cloudnet/earthcare-downloader/actions/workflows/test.yml/badge.svg)](https://github.com/actris-cloudnet/earthcare-downloader/actions/workflows/test.yml)
 [![PyPI version](https://badge.fury.io/py/earthcare-downloader.svg)](https://badge.fury.io/py/earthcare-downloader)
 
-A Python tool for downloading [EarthCARE](https://earth.esa.int/eogateway/missions/earthcare) satellite data
+A Python tool for downloading [EarthCARE](https://earth.esa.int/eogateway/missions/earthcare) satellite data from [ESA servers](https://ec-pdgs-discovery.eo.esa.int/sxcat).
 
 ## Installation
 
