@@ -3,7 +3,7 @@
 [![CI](https://github.com/actris-cloudnet/earthcare-downloader/actions/workflows/test.yml/badge.svg)](https://github.com/actris-cloudnet/earthcare-downloader/actions/workflows/test.yml)
 [![PyPI version](https://badge.fury.io/py/earthcare-downloader.svg)](https://badge.fury.io/py/earthcare-downloader)
 
-A Python tool for downloading [EarthCARE](https://earth.esa.int/eogateway/missions/earthcare) satellite data from [ESA servers](https://ec-pdgs-discovery.eo.esa.int/sxcat).
+A Python tool for searching and downloading [EarthCARE](https://earth.esa.int/eogateway/missions/earthcare) satellite data from the European Space Agency’s (ESA) [Online Dissemination services](https://ec-pdgs-discovery.eo.esa.int/sxcat).
 
 ## Installation
 
@@ -122,6 +122,16 @@ from earthcare_downloader.aio import search, download
 files = await search(product="CPR_TC__2A", date="2025-01-01")
 paths = await download(files, unzip=True)
 ```
+
+## Disclaimer
+
+This package provides tools to access data from the European Space Agency’s (ESA)
+Online Dissemination services. The package does not host or redistribute ESA data.
+
+All data are :copyright: European Space Agency (ESA) and subject to the
+[ESA Online Dissemination Terms and Conditions](https://earth.esa.int/eogateway/terms-and-conditions).
+
+Please ensure your use complies with ESA’s non-commercial and attribution requirements.
 
 ## License
 
