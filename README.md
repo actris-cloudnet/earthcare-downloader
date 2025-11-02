@@ -82,7 +82,7 @@ Available products:
 |              | [BM\_\_RAD_2B](https://earthcarehandbook.earth.esa.int/catalogue/bm__rad_2b)   | BBR-MSI Radiative Fluxes and Heating Rates       |
 |              | \*[AC\_\_CLP_2B](https://eolp.jaxa.jp/EarthCARE_L2B_AC__CLP.html)              | CPR-ATLID Synergy Cloud Properties               |
 
-\* = JAXA product
+\* = [JAXA](https://www.eorc.jaxa.jp/EARTHCARE/) product
 
 ### Examples
 
