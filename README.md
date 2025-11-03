@@ -128,7 +128,7 @@ paths = await download(files, unzip=True)
 This package provides tools to access data from the European Space Agency’s (ESA)
 Online Dissemination services. The package does not host or redistribute ESA data.
 
-All data are :copyright: European Space Agency (ESA) and subject to the
+All data are &copy; European Space Agency (ESA) and subject to the
 [ESA Online Dissemination Terms and Conditions](https://earth.esa.int/eogateway/terms-and-conditions).
 Please ensure your use complies with ESA’s non-commercial and attribution requirements.
 
