@@ -19,6 +19,7 @@ async def search(
     lat: float | None = None,
     lon: float | None = None,
     radius: float | None = None,
+    all: bool = False,
 ) -> list[File]:
     if start is None:
         start = utils.MISSION_START
@@ -52,6 +53,7 @@ async def search(
         stop=stop,
         orbit_min=orbit_min,
         orbit_max=orbit_max or utils.MAX_ORBITS,
+        all=all,
     )
     return await get_files(search_params)
 

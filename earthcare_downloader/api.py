@@ -18,6 +18,7 @@ def search(
     lat: float | None = None,
     lon: float | None = None,
     radius: float | None = None,
+    all: bool = False,
 ) -> list[File]:
     """Search for EarthCARE data files matching the given parameters.
 
@@ -32,6 +33,8 @@ def search(
         lat: Latitude of the center point.
         lon: Longitude of the center point.
         radius: Search radius in kilometers. Default is whole Earth.
+        all: Whether to search for all versions (different baselines and/or
+            processing runs) of the product. Default is False.
 
     Returns:
         List of URLs of the matching data files.
@@ -48,6 +51,7 @@ def search(
             lat,
             lon,
             radius,
+            all,
         )
     )
 

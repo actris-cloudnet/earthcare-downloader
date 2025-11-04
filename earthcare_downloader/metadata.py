@@ -1,4 +1,5 @@
 import asyncio
+import datetime
 import logging
 
 import aiohttp
@@ -54,18 +55,52 @@ async def get_files(params: SearchParams) -> list[File]:
             tasks.append(_fetch_files(session, urls[type], query_params))
         results = await asyncio.gather(*tasks, return_exceptions=False)
 
-    return [
-        File(
-            url=url,
-            product=product,
-            filename=url.split("/")[-1],
-            server=url.split("/data/")[0],
-        )
+    files = [
+        _create_file(url, product)
         for result in results
         for url in result
         for product in params.product
         if product in url
     ]
+    if params.all is False:
+        files = _parse_newest_file_versions(files)
+
+    return files
+
+
+def _create_file(url: str, product: str) -> File:
+    parts = url.split("/")
+    filename = parts[-1]
+    return File(
+        url=url,
+        product=product,
+        filename=filename,
+        server=url.split("/data/")[0],
+        baseline=filename.split("_")[1][-2:],
+        frame_start_time=datetime.datetime.strptime(
+            url.split("_")[-3], "%Y%m%dT%H%M%SZ"
+        ),
+        processing_time=datetime.datetime.strptime(
+            url.split("_")[-2], "%Y%m%dT%H%M%SZ"
+        ),
+        identifier="_".join(filename.split("_")[2:-2]),
+    )
+
+
+def _parse_newest_file_versions(files: list[File]) -> list[File]:
+    files_filtered: dict[str, File] = {}
+    for f in files:
+        key = f.identifier
+        current = files_filtered.get(key)
+        if current is None:
+            files_filtered[key] = f
+        else:
+            if f.baseline > current.baseline or (
+                f.baseline == current.baseline
+                and f.processing_time > current.processing_time
+            ):
+                files_filtered[key] = f
+    return list(files_filtered.values())
 
 
 async def _fetch_files(

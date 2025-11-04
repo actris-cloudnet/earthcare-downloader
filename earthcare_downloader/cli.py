@@ -118,6 +118,13 @@ def main():
         help="Disable prompt for confirmation before downloading files.",
         default=False,
     )
+    parser.add_argument(
+        "--all",
+        action="store_true",
+        help="Download all versions (different baselines and/or processing runs) "
+        "of the product.",
+        default=False,
+    )
 
     args = parser.parse_args()
 
@@ -141,6 +148,7 @@ def main():
         stop=args.stop,
         orbit_min=args.orbit_min,
         orbit_max=args.orbit_max or utils.MAX_ORBITS,
+        all=args.all,
     )
 
     task_params = TaskParams(

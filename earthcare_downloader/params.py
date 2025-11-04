@@ -13,6 +13,7 @@ class SearchParams:
     stop: datetime.date
     orbit_min: int
     orbit_max: int
+    all: bool
 
 
 @dataclass
@@ -32,3 +33,7 @@ class File:
     product: str
     filename: str
     server: str
+    baseline: str
+    frame_start_time: datetime.datetime
+    processing_time: datetime.datetime
+    identifier: str
