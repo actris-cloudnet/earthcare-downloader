@@ -94,7 +94,7 @@ Available products:
 Download all `CPR_TC__2A` overpass data within 5 km of Hyytiälä, Finland:
 
 ```bash
-earthcare-downloader -p CPR_TC__2A --lat 61.844 --lon 24.287 -d 5
+earthcare-downloader -p CPR_TC__2A --lat 61.844 --lon 24.287 -r 5
 ```
 
 Download all `ATL_ALD_2A` and `AUX_JSG_1D` data from two days:
