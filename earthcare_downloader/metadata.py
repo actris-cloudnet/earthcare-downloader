@@ -1,6 +1,7 @@
 import asyncio
 import datetime
 import logging
+from pathlib import Path
 
 import aiohttp
 
@@ -69,21 +70,17 @@ async def get_files(params: SearchParams) -> list[File]:
 
 
 def _create_file(url: str, product: str) -> File:
-    parts = url.split("/")
-    filename = parts[-1]
+    filename = Path(url).name
+    parts = filename.split("_")
     return File(
         url=url,
         product=product,
         filename=filename,
         server=url.split("/data/")[0],
-        baseline=filename.split("_")[1][-2:],
-        frame_start_time=datetime.datetime.strptime(
-            url.split("_")[-3], "%Y%m%dT%H%M%SZ"
-        ),
-        processing_time=datetime.datetime.strptime(
-            url.split("_")[-2], "%Y%m%dT%H%M%SZ"
-        ),
-        identifier="_".join(filename.split("_")[2:-2]),
+        baseline=parts[1][-2:],
+        frame_start_time=datetime.datetime.strptime(parts[-3], "%Y%m%dT%H%M%SZ"),
+        processing_time=datetime.datetime.strptime(parts[-2], "%Y%m%dT%H%M%SZ"),
+        identifier="_".join(parts[2:-2]),
     )
 
 
