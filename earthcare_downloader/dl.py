@@ -70,7 +70,7 @@ async def search_and_download(
         files_sorted = sorted(files, key=lambda f: f.frame_start_time)
         header = (
             f"{'PRODUCT':<11} {'BASELINE':<10} "
-            f"{'FRAME START TIME':<22} {'PROCESSING TIME':<19}"
+            f"{'FRAME START TIME':<20} {'PROCESSING TIME':<19}"
         )
         logging.info(header)
         logging.info("-" * len(header))
