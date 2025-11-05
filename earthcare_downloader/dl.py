@@ -16,6 +16,8 @@ from earthcare_downloader.html_parser import HTMLParser
 
 from .params import File, SearchParams, TaskParams
 
+logging.basicConfig(level=logging.INFO, format="%(message)s")
+
 FILE_PATH = Path(__file__).resolve().parent
 COOKIE_PATH = (
     Path(user_cache_dir("earthcare_downloader", ensure_exists=True)) / "cookies.pkl"
@@ -65,8 +67,20 @@ async def search_and_download(
         return []
 
     if task_params.show:
-        for file in files:
-            logging.info(file.url)
+        files_sorted = sorted(files, key=lambda f: f.frame_start_time)
+        header = (
+            f"{'PRODUCT':<11} {'BASELINE':<10} "
+            f"{'FRAME START TIME':<22} {'PROCESSING TIME':<19}"
+        )
+        logging.info(header)
+        logging.info("-" * len(header))
+
+        for f in files_sorted:
+            logging.info(
+                f"{f.product:<14} {f.baseline:<7} "
+                f"{f.frame_start_time:%Y-%m-%d %H:%M:%S}  "
+                f"{f.processing_time:%Y-%m-%d %H:%M:%S}"
+            )
 
     if not task_params.no_prompt:
         confirmed = input(
