@@ -5,11 +5,11 @@ from . import utils
 from .dl import download_files
 from .metadata import get_files
 from .params import File, SearchParams, TaskParams
-from .products import Product
+from .products import ProductsInput
 
 
 async def search(
-    product: Product | list[Product],
+    product: ProductsInput,
     start: str | datetime.date | None = None,
     stop: str | datetime.date | None = None,
     date: str | datetime.date | None = None,

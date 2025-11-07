@@ -4,11 +4,11 @@ from pathlib import Path
 
 from . import aio
 from .params import File
-from .products import Product
+from .products import ProductsInput
 
 
 def search(
-    product: Product | list[Product],
+    product: ProductsInput,
     start: str | datetime.date | None = None,
     stop: str | datetime.date | None = None,
     date: str | datetime.date | None = None,

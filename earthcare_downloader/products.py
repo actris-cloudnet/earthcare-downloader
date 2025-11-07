@@ -1,4 +1,6 @@
+from collections.abc import Iterable
 from enum import Enum
+from typing import TypeAlias
 
 
 class ESAProd(str, Enum):
@@ -44,7 +46,9 @@ class OrbitData(str, Enum):
     MPL_ORBSCT = "MPL_ORBSCT"
 
 
-Product = ESAProd | JAXAProd | OrbitData
+Product: TypeAlias = ESAProd | JAXAProd | OrbitData
+ProductInput: TypeAlias = str | Product
+ProductsInput: TypeAlias = ProductInput | Iterable[ProductInput]
 
 VALID_PRODUCTS = (
     {e.value for e in ESAProd}

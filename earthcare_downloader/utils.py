@@ -3,7 +3,7 @@ import math
 from argparse import ArgumentTypeError
 from typing import Final
 
-from .products import VALID_PRODUCTS, Product
+from .products import VALID_PRODUCTS, Product, ProductsInput
 
 MISSION_START: Final = datetime.date(2024, 5, 28)
 MAX_ORBITS: Final = 1_000_000_000
@@ -36,11 +36,11 @@ def validate_lon(lon: float | None) -> None:
         raise ValueError("Longitude must be between -180 and 180 degrees.")
 
 
-def validate_products(products: str | list[Product]) -> list[str]:
+def validate_products(products: ProductsInput) -> list[str]:
     if isinstance(products, str):
         raw_products = products.split(",")
     else:
-        raw_products = [p.value for p in products]
+        raw_products = [p.value if isinstance(p, Product) else p for p in products]
 
     input_products = set(raw_products)
     if invalid_products := (input_products - VALID_PRODUCTS):
