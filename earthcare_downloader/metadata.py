@@ -16,9 +16,13 @@ async def get_files(params: SearchParams) -> list[File]:
     common_params = _get_query_params(params)
 
     product_groups = {
-        "esa-lv1": [p for p in params.product if p in ESAProd and "1" in p],
-        "esa-lv2": [p for p in params.product if p in ESAProd and "2" in p],
-        "jaxa-lv2": [p for p in params.product if p in JAXAProd],
+        "esa-lv1": [
+            p for p in params.product if p in ESAProd._value2member_map_ and "1" in p
+        ],
+        "esa-lv2": [
+            p for p in params.product if p in ESAProd._value2member_map_ and "2" in p
+        ],
+        "jaxa-lv2": [p for p in params.product if p in JAXAProd._value2member_map_],
         "orbit-scenarios": [p for p in params.product if p == OrbitData.MPL_ORBSCT],
         "orbit-predictions": [p for p in params.product if p == OrbitData.AUX_ORBPRE],
     }
