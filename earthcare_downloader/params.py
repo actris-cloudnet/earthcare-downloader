@@ -23,7 +23,7 @@ class TaskParams:
     by_product: bool
     unzip: bool
     show: bool
-    quiet: bool
+    quiet: bool | None
     no_prompt: bool
 
 

@@ -64,7 +64,7 @@ async def download(
     by_product: bool = False,
     unzip: bool = False,
     max_workers: int = 5,
-    quiet: bool = True,
+    quiet: bool | None = None,
     credentials: tuple[str, str] | None = None,
 ) -> list[Path]:
     task_params = TaskParams(

@@ -62,7 +62,7 @@ def download(
     by_product: bool = False,
     unzip: bool = False,
     max_workers: int = 5,
-    quiet: bool = False,
+    quiet: bool | None = None,
     credentials: tuple[str, str] | None = None,
 ) -> list[Path]:
     """Download EarthCARE data files from the given URLs.
