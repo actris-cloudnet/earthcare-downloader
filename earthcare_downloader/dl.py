@@ -135,7 +135,11 @@ async def download_files(
             )
             task = asyncio.create_task(_download_with_retries(dl_stuff))
             tasks.append(task)
+        if task_params.quiet is True:
+            print(f"Downloading {len(files)} files...", end="", flush=True)
         full_paths = await asyncio.gather(*tasks)
+        if task_params.quiet is True:
+            print(" done.", flush=True)
         bar_config.overall.close()
         bar_config.overall.clear()
 
