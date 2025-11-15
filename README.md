@@ -87,6 +87,8 @@ Available products:
 |                   **Orbit Data**                    |                                                                                |                                                  |
 |                                                     | [AUX_ORBPRE](https://earthcarehandbook.earth.esa.int/catalogue/aux_orbpre)     | Orbit Predictions                                |
 |                                                     | [MPL_ORBSCT](https://earthcarehandbook.earth.esa.int/catalogue/mpl_orbsct)     | Orbit Scenario                                   |
+|                    **MET Data**                     |                                                                                |                                                  |
+|                                                     | [AUX_MET_1D](https://earthcarehandbook.earth.esa.int/catalogue/aux_met_1d)     | ECMWF meteorological parameters                  |
 
 <span title="JAXA product">:japanese_castle:</span> = [JAXA](https://www.eorc.jaxa.jp/EARTHCARE/) product
 

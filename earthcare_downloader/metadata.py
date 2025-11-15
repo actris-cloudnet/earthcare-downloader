@@ -8,7 +8,7 @@ import aiohttp
 from earthcare_downloader import utils
 
 from .params import File, SearchParams
-from .products import ESAProd, JAXAProd, OrbitData
+from .products import ESAProd, JAXAProd, MetData, OrbitData
 
 
 async def get_files(params: SearchParams) -> list[File]:
@@ -25,6 +25,7 @@ async def get_files(params: SearchParams) -> list[File]:
         "jaxa-lv2": [p for p in params.product if p in JAXAProd._value2member_map_],
         "orbit-scenarios": [p for p in params.product if p == OrbitData.MPL_ORBSCT],
         "orbit-predictions": [p for p in params.product if p == OrbitData.AUX_ORBPRE],
+        "met-data": [p for p in params.product if p == MetData.AUX_MET_1D],
     }
     urls = {
         "esa-lv1": f"{base_url}/EarthCAREL1Validated/search",
@@ -32,6 +33,7 @@ async def get_files(params: SearchParams) -> list[File]:
         "jaxa-lv2": f"{base_url}/JAXAL2Validated/search",
         "orbit-scenarios": f"{base_url}/EarthCAREOrbitData/search",
         "orbit-predictions": f"{base_url}/EarthCAREOrbitData/search",
+        "met-data": f"{base_url}/EarthCAREAuxiliaryXMETL1D/search",
     }
 
     async with aiohttp.ClientSession() as session:
@@ -39,7 +41,9 @@ async def get_files(params: SearchParams) -> list[File]:
         for type, prods in product_groups.items():
             if not prods:
                 continue
-            query_params = {**common_params, "query.productType": prods}
+            query_params = common_params.copy()
+            if type != "met-data":
+                query_params["query.productType"] = prods
             if type in ("orbit-scenarios", "orbit-predictions"):
                 msg = "Orbit number filtering not applicable for orbit data."
                 logging.info(msg)

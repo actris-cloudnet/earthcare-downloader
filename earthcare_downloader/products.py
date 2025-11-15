@@ -46,7 +46,11 @@ class OrbitData(str, Enum):
     MPL_ORBSCT = "MPL_ORBSCT"
 
 
-Product: TypeAlias = ESAProd | JAXAProd | OrbitData
+class MetData(str, Enum):
+    AUX_MET_1D = "AUX_MET_1D"
+
+
+Product: TypeAlias = ESAProd | JAXAProd | OrbitData | MetData
 ProductInput: TypeAlias = str | Product
 ProductsInput: TypeAlias = ProductInput | Iterable[ProductInput]
 
@@ -54,4 +58,5 @@ VALID_PRODUCTS = (
     {e.value for e in ESAProd}
     | {e.value for e in JAXAProd}
     | {e.value for e in OrbitData}
+    | {e.value for e in MetData}
 )
