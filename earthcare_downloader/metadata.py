@@ -45,8 +45,9 @@ async def get_files(params: SearchParams) -> list[File]:
             if type != "met-data":
                 query_params["query.productType"] = prods
             if type in ("orbit-scenarios", "orbit-predictions"):
-                msg = "Orbit number filtering not applicable for orbit data."
-                logging.info(msg)
+                if params.orbit_min != 0 or params.orbit_max is not None:
+                    msg = "Orbit number filtering not applicable for orbit data."
+                    logging.info(msg)
                 query_params.update(
                     {"query.orbitNumber.min": "", "query.orbitNumber.max": ""}
                 )
@@ -141,15 +142,34 @@ def _get_query_params(params: SearchParams) -> dict:
         and params.lon is not None
         and params.distance is not None
     ):
-        lat_buffer = utils.distance_to_lat_deg(params.distance)
-        lon_buffer = utils.distance_to_lon_deg(params.lat, params.distance)
-        query_params.update(
-            {
-                "query.footprint.minlat": max(params.lat - lat_buffer, -90),
-                "query.footprint.minlon": max(params.lon - lon_buffer, -180),
-                "query.footprint.maxlat": min(params.lat + lat_buffer, 90),
-                "query.footprint.maxlon": min(params.lon + lon_buffer, 180),
-            }
+        lat_buf = utils.distance_to_lat_deg(params.distance)
+        lon_buf = utils.distance_to_lon_deg(params.lat, params.distance)
+        _set_footprint(
+            query_params,
+            max(params.lat - lat_buf, -90),
+            min(params.lat + lat_buf, 90),
+            max(params.lon - lon_buf, -180),
+            min(params.lon + lon_buf, 180),
         )
-
+    elif params.lat_range is not None and params.lon_range is not None:
+        _set_footprint(
+            query_params,
+            params.lat_range[0],
+            params.lat_range[1],
+            params.lon_range[0],
+            params.lon_range[1],
+        )
     return query_params
+
+
+def _set_footprint(
+    q: dict, minlat: float, maxlat: float, minlon: float, maxlon: float
+) -> None:
+    q.update(
+        {
+            "query.footprint.minlat": minlat,
+            "query.footprint.maxlat": maxlat,
+            "query.footprint.minlon": minlon,
+            "query.footprint.maxlon": maxlon,
+        }
+    )

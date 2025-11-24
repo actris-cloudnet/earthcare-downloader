@@ -36,6 +36,38 @@ def validate_lon(lon: float | None) -> None:
         raise ValueError("Longitude must be between -180 and 180 degrees.")
 
 
+def validate_lat_range(lat_range: tuple[float, float] | None) -> None:
+    if lat_range is not None:
+        min_lat, max_lat = lat_range
+        if min_lat < -90 or max_lat > 90 or min_lat >= max_lat:
+            raise ValueError(
+                "Latitude range must be between -90 and 90 degrees and min < max."
+            )
+
+
+def validate_lon_range(lon_range: tuple[float, float] | None) -> None:
+    if lon_range is not None:
+        min_lon, max_lon = lon_range
+        if min_lon < -180 or max_lon > 180 or min_lon >= max_lon:
+            raise ValueError(
+                "Longitude range must be between -180 and 180 degrees and min < max."
+            )
+
+
+def validate_coordinates(
+    lat: float | None,
+    lon: float | None,
+    lat_range: tuple[float, float] | None,
+    lon_range: tuple[float, float] | None,
+) -> None:
+    has_point = lat is not None or lon is not None
+    has_range = lat_range is not None or lon_range is not None
+    if has_point and has_range:
+        raise ValueError(
+            "Cannot use --lat/--lon together with --lat-range/--lon-range."
+        )
+
+
 def validate_products(products: ProductsInput) -> list[str]:
     if isinstance(products, str):
         raw_products = products.split(",")

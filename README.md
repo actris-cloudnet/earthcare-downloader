@@ -26,27 +26,29 @@ earthcare-downloader -p PRODUCT [options]
 
 where the arguments are:
 
-| Argument              | Description                                                                     |
-| --------------------- | ------------------------------------------------------------------------------- |
-| `-p`, `--product`     | Product type(s) to download (see full list below).                              |
-| `--start`             | Start date (YYYY-MM-DD).                                                        |
-| `--stop`              | Stop date (YYYY-MM-DD).                                                         |
-| `-d`, `--date`        | Single date (YYYY-MM-DD). Overrides `--start` and `--stop`                      |
-| `--orbit-min`         | Minimum orbit number.                                                           |
-| `--orbit-max`         | Maximum orbit number.                                                           |
-| `--orbit`             | Single orbit number. Overrides `--orbit-min` and `--orbit-max`                  |
-| `--lat LAT`           | Latitude of the target location (-90..90 degrees).                              |
-| `--lon LON`           | Longitude of the target location (-180..180 degrees).                           |
-| `-r`, `--radius`      | Search radius around the location in km. Use with `--lat` and `--lon`.          |
-| `-o`, `--output-path` | Directory to save downloaded files (default: current directory).                |
-| `--by-product`        | Create subdirectories for each product type.                                    |
-| `--max-workers`       | Maximum number of concurrent downloads (default: **5**).                        |
-| `--show`              | Show filenames before downloading.                                              |
-| `--unzip`             | Automatically unzip downloaded files.                                           |
-| `--quiet`             | Hide progress bars during download.                                             |
-| `--no-prompt`         | Skip confirmation prompt before downloading.                                    |
-| `--all`               | Download all versions of the file. By default download only the newest version. |
-| `-h`, `--help`        | Show help message and exit.                                                     |
+| Argument                | Description                                                                     |
+| ----------------------- | ------------------------------------------------------------------------------- |
+| `-p`, `--product`       | Product type(s) to download (see full list below).                              |
+| `--start`               | Start date (YYYY-MM-DD).                                                        |
+| `--stop`                | Stop date (YYYY-MM-DD).                                                         |
+| `-d`, `--date`          | Single date (YYYY-MM-DD). Overrides `--start` and `--stop`                      |
+| `--orbit-min`           | Minimum orbit number.                                                           |
+| `--orbit-max`           | Maximum orbit number.                                                           |
+| `--orbit`               | Single orbit number. Overrides `--orbit-min` and `--orbit-max`                  |
+| `--lat LAT`             | Latitude of the target location (-90..90 degrees). Use with `--lon` and `-r`    |
+| `--lon LON`             | Longitude of the target location (-180..180 degrees). Use with `--lat` and `-r` |
+| `-r`, `--radius`        | Search radius around the location in km. Use with `--lat` and `--lon`.          |
+| `--lat-range LAT1,LAT2` | Latitude range (min_lat,max_lat) to search for data. Use with `--lon-range`.    |
+| `--lon-range LON1,LON2` | Longitude range (min_lon,max_lon) to search for data. Use with `--lat-range`.   |
+| `-o`, `--output-path`   | Directory to save downloaded files (default: current directory).                |
+| `--by-product`          | Create subdirectories for each product type.                                    |
+| `--max-workers`         | Maximum number of concurrent downloads (default: **5**).                        |
+| `--show`                | Show filenames before downloading.                                              |
+| `--unzip`               | Automatically unzip downloaded files.                                           |
+| `-q`, `--quiet`         | Hide progress bars during download.                                             |
+| `--no-prompt`           | Skip confirmation prompt before downloading.                                    |
+| `--all`                 | Download all versions of the file. By default download only the newest version. |
+| `-h`, `--help`          | Show help message and exit.                                                     |
 
 Available products:
 

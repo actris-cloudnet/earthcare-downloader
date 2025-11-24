@@ -75,6 +75,19 @@ def main():
         help="Distance [km] from the location to search for data. "
         "Use with --lat and --lon.",
     )
+    # add lat_range and lon_range arguments
+    parser.add_argument(
+        "--lat-range",
+        type=lambda s: tuple(map(float, s.split(","))),
+        help="Latitude range (min_lat,max_lat) to search for data. "
+        "Use with --lon-range.",
+    )
+    parser.add_argument(
+        "--lon-range",
+        type=lambda s: tuple(map(float, s.split(","))),
+        help="Longitude range (min_lon,max_lon) to search for data. "
+        "Use with --lat-range.",
+    )
     parser.add_argument(
         "-o",
         "--output-path",
@@ -107,6 +120,7 @@ def main():
         default=False,
     )
     parser.add_argument(
+        "-q",
         "--quiet",
         action="store_true",
         help="Disable progress bars during download.",
@@ -131,6 +145,16 @@ def main():
     utils.validate_lat(args.lat)
     utils.validate_lon(args.lon)
 
+    utils.validate_lat_range(args.lat_range)
+    utils.validate_lon_range(args.lon_range)
+
+    utils.validate_coordinates(
+        args.lat,
+        args.lon,
+        args.lat_range,
+        args.lon_range,
+    )
+
     if args.date is not None:
         args.start = args.date
         args.stop = args.date
@@ -142,6 +166,8 @@ def main():
     search_params = SearchParams(
         lat=args.lat,
         lon=args.lon,
+        lat_range=args.lat_range,
+        lon_range=args.lon_range,
         distance=args.radius or utils.EARTH_HALF_CIRCUMFERENCE,
         product=args.product,
         start=args.start,

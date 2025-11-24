@@ -8,6 +8,8 @@ class SearchParams:
     lat: float | None
     lon: float | None
     distance: float
+    lat_range: tuple[float, float] | None
+    lon_range: tuple[float, float] | None
     product: list[str]
     start: datetime.date
     stop: datetime.date

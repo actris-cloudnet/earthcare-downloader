@@ -19,6 +19,8 @@ async def search(
     lat: float | None = None,
     lon: float | None = None,
     radius: float | None = None,
+    lat_range: tuple[float, float] | None = None,
+    lon_range: tuple[float, float] | None = None,
     all: bool = False,
 ) -> list[File]:
     if start is None:
@@ -44,10 +46,17 @@ async def search(
     utils.validate_lat(lat)
     utils.validate_lon(lon)
 
+    utils.validate_lat_range(lat_range)
+    utils.validate_lon_range(lon_range)
+
+    utils.validate_coordinates(lat, lon, lat_range, lon_range)
+
     search_params = SearchParams(
         lat=lat,
         lon=lon,
         distance=radius or utils.EARTH_HALF_CIRCUMFERENCE,
+        lat_range=lat_range,
+        lon_range=lon_range,
         product=utils.validate_products(product),
         start=start,
         stop=stop,
