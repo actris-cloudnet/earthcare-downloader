@@ -1,6 +1,5 @@
 import asyncio
 import datetime
-import logging
 from pathlib import Path
 
 import aiohttp
@@ -45,15 +44,11 @@ async def get_files(params: SearchParams) -> list[File]:
             if type != "met-data":
                 query_params["query.productType"] = prods
             if type in ("orbit-scenarios", "orbit-predictions"):
-                if params.orbit_min != 0 or params.orbit_max is not None:
-                    msg = "Orbit number filtering not applicable for orbit data."
-                    logging.info(msg)
                 query_params.update(
                     {"query.orbitNumber.min": "", "query.orbitNumber.max": ""}
                 )
+                _set_footprint(query_params)
             if type == "orbit-scenarios":
-                msg = "Acquisition date filtering not applicable for orbit scenarios."
-                logging.info(msg)
                 query_params.update(
                     {
                         "query.beginAcquisition.start": "",
@@ -62,6 +57,8 @@ async def get_files(params: SearchParams) -> list[File]:
                         "query.endAcquisition.stop": "",
                     }
                 )
+            if type == "met-data":
+                _set_footprint(query_params)
             tasks.append(_fetch_files(session, urls[type], query_params))
         results = await asyncio.gather(*tasks, return_exceptions=False)
 
@@ -163,7 +160,11 @@ def _get_query_params(params: SearchParams) -> dict:
 
 
 def _set_footprint(
-    q: dict, minlat: float, maxlat: float, minlon: float, maxlon: float
+    q: dict,
+    minlat: float | str = "",
+    maxlat: float | str = "",
+    minlon: float | str = "",
+    maxlon: float | str = "",
 ) -> None:
     q.update(
         {
