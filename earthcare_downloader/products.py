@@ -25,10 +25,10 @@ class ESAProd(str, Enum):
     ATL_TC__2A = "ATL_TC__2A"
     BM__RAD_2B = "BM__RAD_2B"
     CPR_CD__2A = "CPR_CD__2A"
-    CPR_CLD__2A = "CPR_CLD__2A"
-    CPR_FMR__2A = "CPR_FMR__2A"
+    CPR_CLD_2A = "CPR_CLD_2A"
+    CPR_FMR_2A = "CPR_FMR_2A"
     CPR_TC__2A = "CPR_TC__2A"
-    MSI_AOT__2A = "MSI_AOT__2A"
+    MSI_AOT_2A = "MSI_AOT_2A"
     MSI_CM__2A = "MSI_CM__2A"
     MSI_COP_2A = "MSI_COP_2A"
 
