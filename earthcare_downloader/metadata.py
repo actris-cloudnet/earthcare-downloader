@@ -80,6 +80,10 @@ async def get_files(params: SearchParams) -> list[File]:
 def _create_file(url: str, product: str) -> File:
     filename = Path(url).name
     parts = filename.split("_")
+    try:
+        processing_time = datetime.datetime.strptime(parts[-2], "%Y%m%dT%H%M%SZ")
+    except ValueError:
+        processing_time = None
     return File(
         url=url,
         product=product,
@@ -87,7 +91,7 @@ def _create_file(url: str, product: str) -> File:
         server=url.split("/data/")[0],
         baseline=parts[1][-2:],
         frame_start_time=datetime.datetime.strptime(parts[-3], "%Y%m%dT%H%M%SZ"),
-        processing_time=datetime.datetime.strptime(parts[-2], "%Y%m%dT%H%M%SZ"),
+        processing_time=processing_time,
         identifier="_".join(parts[2:-2]),
     )
 
@@ -102,6 +106,8 @@ def _parse_newest_file_versions(files: list[File]) -> list[File]:
         else:
             if f.baseline > current.baseline or (
                 f.baseline == current.baseline
+                and f.processing_time is not None
+                and current.processing_time is not None
                 and f.processing_time > current.processing_time
             ):
                 files_filtered[key] = f

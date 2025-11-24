@@ -35,5 +35,5 @@ class File:
     server: str
     baseline: str
     frame_start_time: datetime.datetime
-    processing_time: datetime.datetime
+    processing_time: datetime.datetime | None
     identifier: str
