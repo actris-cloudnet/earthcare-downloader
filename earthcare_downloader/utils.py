@@ -66,6 +66,14 @@ def validate_coordinates(
         raise ValueError(
             "Cannot use --lat/--lon together with --lat-range/--lon-range."
         )
+    if (lat is None and lon is not None) or (lat is not None and lon is None):
+        raise ValueError("Both latitude and longitude must be provided together.")
+    if (lat_range is None and lon_range is not None) or (
+        lat_range is not None and lon_range is None
+    ):
+        raise ValueError(
+            "Both latitude range and longitude range must be provided together."
+        )
 
 
 def validate_products(products: ProductsInput) -> list[str]:

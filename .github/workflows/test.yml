@@ -25,3 +25,6 @@ jobs:
         if: startsWith(matrix.os, 'ubuntu-')
         run: |
           pre-commit run --all-files --show-diff-on-failure
+      - name: Run tests
+        run: |
+          pytest
