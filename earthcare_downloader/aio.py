@@ -43,12 +43,6 @@ async def search(
         orbit_min = orbit
         orbit_max = orbit
 
-    utils.validate_lat(lat)
-    utils.validate_lon(lon)
-
-    utils.validate_lat_range(lat_range)
-    utils.validate_lon_range(lon_range)
-
     utils.validate_coordinates(lat, lon, lat_range, lon_range)
 
     search_params = SearchParams(

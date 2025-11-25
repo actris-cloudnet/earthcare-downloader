@@ -142,12 +142,6 @@ def main():
 
     args = parser.parse_args()
 
-    utils.validate_lat(args.lat)
-    utils.validate_lon(args.lon)
-
-    utils.validate_lat_range(args.lat_range)
-    utils.validate_lon_range(args.lon_range)
-
     utils.validate_coordinates(
         args.lat,
         args.lon,

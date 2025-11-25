@@ -26,40 +26,17 @@ def str2date(date_str: str) -> datetime.date:
     return datetime.datetime.strptime(date_str, "%Y-%m-%d").date()
 
 
-def validate_lat(lat: float | None) -> None:
-    if lat is not None and (lat < -90 or lat > 90):
-        raise ValueError("Latitude must be between -90 and 90 degrees.")
-
-
-def validate_lon(lon: float | None) -> None:
-    if lon is not None and (lon < -180 or lon > 180):
-        raise ValueError("Longitude must be between -180 and 180 degrees.")
-
-
-def validate_lat_range(lat_range: tuple[float, float] | None) -> None:
-    if lat_range is not None:
-        min_lat, max_lat = lat_range
-        if min_lat < -90 or max_lat > 90 or min_lat >= max_lat:
-            raise ValueError(
-                "Latitude range must be between -90 and 90 degrees and min < max."
-            )
-
-
-def validate_lon_range(lon_range: tuple[float, float] | None) -> None:
-    if lon_range is not None:
-        min_lon, max_lon = lon_range
-        if min_lon < -180 or max_lon > 180 or min_lon >= max_lon:
-            raise ValueError(
-                "Longitude range must be between -180 and 180 degrees and min < max."
-            )
-
-
 def validate_coordinates(
     lat: float | None,
     lon: float | None,
     lat_range: tuple[float, float] | None,
     lon_range: tuple[float, float] | None,
 ) -> None:
+    _validate_lat(lat)
+    _validate_lon(lon)
+    _validate_lat_range(lat_range)
+    _validate_lon_range(lon_range)
+
     has_point = lat is not None or lon is not None
     has_range = lat_range is not None or lon_range is not None
     if has_point and has_range:
@@ -74,6 +51,34 @@ def validate_coordinates(
         raise ValueError(
             "Both latitude range and longitude range must be provided together."
         )
+
+
+def _validate_lat(lat: float | None) -> None:
+    if lat is not None and (lat < -90 or lat > 90):
+        raise ValueError("Latitude must be between -90 and 90 degrees.")
+
+
+def _validate_lon(lon: float | None) -> None:
+    if lon is not None and (lon < -180 or lon > 180):
+        raise ValueError("Longitude must be between -180 and 180 degrees.")
+
+
+def _validate_lat_range(lat_range: tuple[float, float] | None) -> None:
+    if lat_range is not None:
+        min_lat, max_lat = lat_range
+        if min_lat < -90 or max_lat > 90 or min_lat >= max_lat:
+            raise ValueError(
+                "Latitude range must be between -90 and 90 degrees and min < max."
+            )
+
+
+def _validate_lon_range(lon_range: tuple[float, float] | None) -> None:
+    if lon_range is not None:
+        min_lon, max_lon = lon_range
+        if min_lon < -180 or max_lon > 180 or min_lon >= max_lon:
+            raise ValueError(
+                "Longitude range must be between -180 and 180 degrees and min < max."
+            )
 
 
 def validate_products(products: ProductsInput) -> list[str]:
