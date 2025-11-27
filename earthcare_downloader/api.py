@@ -25,7 +25,7 @@ def search(
     """Search for EarthCARE data files matching the given parameters.
 
     Args:
-        product: Product type to search for.
+        product: Product type(s) to search for.
         start: Start date (inclusive) for data search. Default is mission start date.
         stop: Stop date (inclusive) for data search. Default is today's date.
         date: Single date for data search. Overrides start and stop.
@@ -69,10 +69,11 @@ def download(
     files: list[File],
     output_path: str | Path = Path("."),
     by_product: bool = False,
-    unzip: bool = False,
+    unzip: bool = True,
     max_workers: int = 5,
     quiet: bool | None = None,
     credentials: tuple[str, str] | None = None,
+    force: bool = False,
 ) -> list[Path]:
     """Download EarthCARE data files from the given File objects.
 
@@ -82,10 +83,12 @@ def download(
             directory.
         by_product: Whether to create subdirectories for each product type.
             Default is False.
-        unzip: Whether to unzip the downloaded files. Default is False.
+        unzip: Whether to unzip the downloaded files. Default is True.
         max_workers: Maximum number of concurrent download workers. Default is 5.
         quiet: Whether to disable progress bars during download. Default is False.
         credentials: Optional tuple of (username, password) for authentication.
+        force: Whether to force downloading, even if file with the
+            same name exists. Default is False.
 
     Returns:
         List of Paths to the downloaded files.
@@ -100,5 +103,6 @@ def download(
             max_workers=max_workers,
             quiet=quiet,
             credentials=credentials,
+            force=force,
         )
     )

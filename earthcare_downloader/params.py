@@ -27,6 +27,7 @@ class TaskParams:
     show: bool
     quiet: bool | None
     no_prompt: bool
+    force: bool
 
 
 @dataclass

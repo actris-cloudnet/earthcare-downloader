@@ -114,10 +114,17 @@ def main():
         default=False,
     )
     parser.add_argument(
+        "--no-unzip",
+        action="store_true",
+        help="Do not unzip downloaded files after download.",
+        default=False,
+    )
+    # Deprecated --unzip argument kept for backward compatibility
+    parser.add_argument(
         "--unzip",
         action="store_true",
-        help="Unzip downloaded files after download.",
-        default=False,
+        help=argparse.SUPPRESS,
+        default=True,
     )
     parser.add_argument(
         "-q",
@@ -137,6 +144,14 @@ def main():
         action="store_true",
         help="Download all versions (different baselines and/or processing runs) "
         "of the product.",
+        default=False,
+    )
+    parser.add_argument(
+        "-f",
+        "--force",
+        action="store_true",
+        help="Force downloading, even if file with "
+        "the same name exists in the target folder.",
         default=False,
     )
 
@@ -175,10 +190,11 @@ def main():
         max_workers=args.max_workers,
         output_path=Path(args.output_path),
         by_product=args.by_product,
-        unzip=args.unzip,
+        unzip=not args.no_unzip,
         show=args.show,
         quiet=args.quiet,
         no_prompt=args.no_prompt,
+        force=args.force,
     )
 
     asyncio.run(

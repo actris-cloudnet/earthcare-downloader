@@ -65,10 +65,11 @@ async def download(
     files: list[File],
     output_path: str | Path = Path("."),
     by_product: bool = False,
-    unzip: bool = False,
+    unzip: bool = True,
     max_workers: int = 5,
     quiet: bool | None = None,
     credentials: tuple[str, str] | None = None,
+    force: bool = False,
 ) -> list[Path]:
     task_params = TaskParams(
         max_workers=max_workers,
@@ -78,5 +79,6 @@ async def download(
         no_prompt=False,
         show=False,
         by_product=by_product,
+        force=force,
     )
     return await download_files(files, task_params, credentials)

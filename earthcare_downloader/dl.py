@@ -125,6 +125,12 @@ async def download_files(
 
             destination = root / Path(file.filename)
 
+            if not task_params.force:
+                if task_params.unzip and destination.with_suffix(".h5").exists():
+                    continue
+                if not task_params.unzip and destination.exists():
+                    continue
+
             dl_stuff = DlParams(
                 url=file.url,
                 destination=destination,

@@ -44,10 +44,11 @@ where the arguments are:
 | `--by-product`          | Create subdirectories for each product type.                                    |
 | `--max-workers`         | Maximum number of concurrent downloads (default: **5**).                        |
 | `--show`                | Show filenames before downloading.                                              |
-| `--unzip`               | Automatically unzip downloaded files.                                           |
+| `--no-unzip`            | Do not unzip downloaded files. By default the files are unzipped.               |
 | `-q`, `--quiet`         | Hide progress bars during download.                                             |
 | `--no-prompt`           | Skip confirmation prompt before downloading.                                    |
 | `--all`                 | Download all versions of the file. By default download only the newest version. |
+| `-f`, `--force`         | Force downloading, even if file with the same name exists in the target folder. |
 | `-h`, `--help`          | Show help message and exit.                                                     |
 
 Available products:
@@ -116,7 +117,7 @@ You can also use `earthcare-downloader` as a Python library:
 from earthcare_downloader import search, download
 
 files = search(product="CPR_TC__2A", date="2025-01-01")
-paths = download(files, unzip=True)
+paths = download(files)
 ```
 
 When working in notebooks, use the asynchronous versions of these functions:
@@ -125,7 +126,7 @@ When working in notebooks, use the asynchronous versions of these functions:
 from earthcare_downloader.aio import search, download
 
 files = await search(product="CPR_TC__2A", date="2025-01-01")
-paths = await download(files, unzip=True)
+paths = await download(files)
 ```
 
 ## Disclaimer
