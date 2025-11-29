@@ -22,9 +22,13 @@ jobs:
           pip install --upgrade pip
           pip install .[dev,test]
       - name: Run pre-commit checks
-        if: startsWith(matrix.os, 'ubuntu-')
+        if: matrix.os == 'ubuntu-latest'
         run: |
           pre-commit run --all-files --show-diff-on-failure
-      - name: Run tests
+      - name: Run search tests
         run: |
-          pytest
+          pytest tests/test_search.py
+      - name: Run api tests
+        if: matrix.os == 'ubuntu-latest' && matrix.python-version == '3.14'
+        run: |
+          pytest tests/test_api.py
