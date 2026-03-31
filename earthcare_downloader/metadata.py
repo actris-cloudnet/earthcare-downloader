@@ -1,5 +1,7 @@
 import asyncio
+import contextlib
 import datetime
+from collections import defaultdict
 from pathlib import Path
 
 import aiohttp
@@ -7,90 +9,69 @@ import aiohttp
 from earthcare_downloader import utils
 
 from .params import File, SearchParams
-from .products import ESAProd, JAXAProd, MetData, OrbitData
+from .products import PRODUCT_TO_COLLECTIONS
+
+BASE_URL = "https://catalog.maap.eo.esa.int/catalogue"
+
+_COLLECTIONS_WITHOUT_ORBIT = {"EarthCAREOrbitData_MAAP", "EarthCAREAuxiliary_MAAP"}
 
 
 async def get_files(params: SearchParams) -> list[File]:
-    base_url = "https://ec-pdgs-discovery.eo.esa.int/socat"
-    common_params = _get_query_params(params)
+    """Query MAAP STAC catalog and return matching files."""
+    has_orbit_filter = params.orbit_min > 0 or params.orbit_max < utils.MAX_ORBITS
 
-    product_groups = {
-        "esa-lv1": [
-            p for p in params.product if p in ESAProd._value2member_map_ and "1" in p
-        ],
-        "esa-lv2": [
-            p for p in params.product if p in ESAProd._value2member_map_ and "2" in p
-        ],
-        "jaxa-lv2": [p for p in params.product if p in JAXAProd._value2member_map_],
-        "orbit-scenarios": [p for p in params.product if p == OrbitData.MPL_ORBSCT],
-        "orbit-predictions": [p for p in params.product if p == OrbitData.AUX_ORBPRE],
-        "met-data": [p for p in params.product if p == MetData.AUX_MET_1D],
-    }
-    urls = {
-        "esa-lv1": f"{base_url}/EarthCAREL1Validated/search",
-        "esa-lv2": f"{base_url}/EarthCAREL2Validated/search",
-        "jaxa-lv2": f"{base_url}/JAXAL2Validated/search",
-        "orbit-scenarios": f"{base_url}/EarthCAREOrbitData/search",
-        "orbit-predictions": f"{base_url}/EarthCAREOrbitData/search",
-        "met-data": f"{base_url}/EarthCAREAuxiliaryXMETL1D/search",
-    }
+    collection_products: dict[str, list[str]] = defaultdict(list)
+    for product in params.product:
+        for collection in PRODUCT_TO_COLLECTIONS.get(product, []):
+            if has_orbit_filter and collection in _COLLECTIONS_WITHOUT_ORBIT:
+                continue
+            collection_products[collection].append(product)
 
     async with aiohttp.ClientSession() as session:
-        tasks = []
-        for type, prods in product_groups.items():
-            if not prods:
-                continue
-            query_params = common_params.copy()
-            if type != "met-data":
-                query_params["query.productType"] = prods
-            if type in ("orbit-scenarios", "orbit-predictions"):
-                query_params.update(
-                    {"query.orbitNumber.min": "", "query.orbitNumber.max": ""}
-                )
-                _set_footprint(query_params)
-            if type == "orbit-scenarios":
-                query_params.update(
-                    {
-                        "query.beginAcquisition.start": "",
-                        "query.beginAcquisition.stop": "",
-                        "query.endAcquisition.start": "",
-                        "query.endAcquisition.stop": "",
-                    }
-                )
-            if type == "met-data":
-                _set_footprint(query_params)
-            tasks.append(_fetch_files(session, urls[type], query_params))
+        tasks = [
+            _fetch_items(session, collection, products, params)
+            for collection, products in collection_products.items()
+        ]
         results = await asyncio.gather(*tasks, return_exceptions=False)
 
-    files = [
-        _create_file(url, product)
-        for result in results
-        for url in result
-        for product in params.product
-        if product in url
-    ]
+    files = [_create_file(feature) for result in results for feature in result]
     if params.all is False:
         files = _parse_newest_file_versions(files)
 
     return files
 
 
-def _create_file(url: str, product: str) -> File:
+def _create_file(feature: dict) -> File:
+    """Parse a STAC feature into a File object."""
+    props = feature["properties"]
+    assets = feature["assets"]
+
+    asset = assets["enclosure_h5"] if "enclosure_h5" in assets else assets["product"]
+
+    url = asset["href"]
     filename = Path(url).name
-    parts = filename.split("_")
-    try:
-        processing_time = datetime.datetime.strptime(parts[-2], "%Y%m%dT%H%M%SZ")
-    except ValueError:
-        processing_time = None
+
+    frame_start_time = datetime.datetime.strptime(
+        props["datetime"], "%Y-%m-%dT%H:%M:%S.%fZ"
+    )
+
+    processing_time = None
+    if "processing:datetime" in props and props["processing:datetime"]:
+        with contextlib.suppress(ValueError, TypeError):
+            processing_time = datetime.datetime.strptime(
+                props["processing:datetime"], "%Y-%m-%dT%H:%M:%S.%fZ"
+            )
+
     return File(
         url=url,
-        product=product,
+        product=props["product:type"],
         filename=filename,
-        server=url.split("/data/")[0],
-        baseline=parts[1][-2:],
-        frame_start_time=datetime.datetime.strptime(parts[-3], "%Y%m%dT%H%M%SZ"),
+        baseline=props.get("version", ""),
+        frame_start_time=frame_start_time,
         processing_time=processing_time,
-        identifier="_".join(parts[2:-2]),
+        identifier=feature["id"],
+        orbit=props.get("sat:absolute_orbit"),
+        file_size=asset.get("file:size"),
     )
 
 
@@ -112,65 +93,105 @@ def _parse_newest_file_versions(files: list[File]) -> list[File]:
     return list(files_filtered.values())
 
 
-async def _fetch_files(
-    session: aiohttp.ClientSession, url: str, query_params: dict
-) -> list[str]:
-    async with session.post(url, data=query_params) as response:
+async def _fetch_items(
+    session: aiohttp.ClientSession,
+    collection: str,
+    products: list[str],
+    params: SearchParams,
+) -> list[dict]:
+    """Fetch all matching STAC items with pagination."""
+    body = _build_search_body(collection, products, params)
+    items: list[dict] = []
+
+    async with session.post(f"{BASE_URL}/search", json=body) as response:
         response.raise_for_status()
-        text = await response.text()
-        return text.splitlines()
+        data = await response.json()
+
+    items.extend(data.get("features", []))
+
+    next_link = _find_next_link(data.get("links", []))
+    while next_link is not None:
+        async with session.get(next_link["href"]) as response:
+            response.raise_for_status()
+            data = await response.json()
+
+        items.extend(data.get("features", []))
+        next_link = _find_next_link(data.get("links", []))
+
+    return items
 
 
-def _get_query_params(params: SearchParams) -> dict:
-    query_params = {
-        "service": "SimpleOnlineCatalogue",
-        "version": "1.2",
-        "request": "search",
-        "format": "text/plain",
-        "query.beginAcquisition.start": params.start,
-        "query.beginAcquisition.stop": params.stop,
-        "query.endAcquisition.start": params.start,
-        "query.endAcquisition.stop": params.stop,
-        "query.orbitNumber.min": params.orbit_min,
-        "query.orbitNumber.max": params.orbit_max,
+def _build_search_body(
+    collection: str,
+    products: list[str],
+    params: SearchParams,
+) -> dict:
+    """Build a STAC search POST body."""
+    body: dict = {
+        "collections": [collection],
+        "datetime": f"{params.start}T00:00:00Z/{params.stop}T23:59:59Z",
+        "limit": 200,
     }
-    if (
-        params.lat is not None
-        and params.lon is not None
-        and params.distance is not None
-    ):
+
+    bbox = _compute_bbox(params)
+    if bbox is not None:
+        body["bbox"] = bbox
+
+    has_orbit = collection not in _COLLECTIONS_WITHOUT_ORBIT
+    cql_filter = _build_cql_filter(products, params, has_orbit=has_orbit)
+    if cql_filter:
+        body["filter"] = cql_filter
+        body["filter-lang"] = "cql2-text"
+
+    return body
+
+
+def _compute_bbox(params: SearchParams) -> list[float] | None:
+    if params.lat is not None and params.lon is not None:
         lat_buf = utils.distance_to_lat_deg(params.distance)
         lon_buf = utils.distance_to_lon_deg(params.lat, params.distance)
-        _set_footprint(
-            query_params,
-            max(params.lat - lat_buf, -90),
-            min(params.lat + lat_buf, 90),
+        return [
             max(params.lon - lon_buf, -180),
+            max(params.lat - lat_buf, -90),
             min(params.lon + lon_buf, 180),
-        )
-    elif params.lat_range is not None and params.lon_range is not None:
-        _set_footprint(
-            query_params,
-            params.lat_range[0],
-            params.lat_range[1],
+            min(params.lat + lat_buf, 90),
+        ]
+    if params.lat_range is not None and params.lon_range is not None:
+        return [
             params.lon_range[0],
+            params.lat_range[0],
             params.lon_range[1],
-        )
-    return query_params
+            params.lat_range[1],
+        ]
+    return None
 
 
-def _set_footprint(
-    q: dict,
-    minlat: float | str = "",
-    maxlat: float | str = "",
-    minlon: float | str = "",
-    maxlon: float | str = "",
-) -> None:
-    q.update(
-        {
-            "query.footprint.minlat": minlat,
-            "query.footprint.maxlat": maxlat,
-            "query.footprint.minlon": minlon,
-            "query.footprint.maxlon": maxlon,
-        }
-    )
+def _build_cql_filter(
+    products: list[str],
+    params: SearchParams,
+    *,
+    has_orbit: bool = True,
+) -> str:
+    """Build CQL2 filter string for product types and orbit constraints."""
+    parts: list[str] = []
+
+    if len(products) == 1:
+        parts.append(f"\"product:type\"='{products[0]}'")
+    elif len(products) > 1:
+        clauses = [f"\"product:type\"='{p}'" for p in products]
+        parts.append(f"({' OR '.join(clauses)})")
+
+    if has_orbit:
+        if params.orbit_min > 0:
+            parts.append(f'"sat:absolute_orbit" >= {params.orbit_min}')
+        if params.orbit_max < utils.MAX_ORBITS:
+            parts.append(f'"sat:absolute_orbit" <= {params.orbit_max}')
+
+    return " AND ".join(parts)
+
+
+def _find_next_link(links: list[dict]) -> dict | None:
+    for link in links:
+        if link.get("rel") == "next":
+            return link
+    return None

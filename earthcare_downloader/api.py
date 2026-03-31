@@ -72,7 +72,7 @@ def download(
     unzip: bool = True,
     max_workers: int = 5,
     quiet: bool | None = None,
-    credentials: tuple[str, str] | None = None,
+    token: str | None = None,
     force: bool = False,
 ) -> list[Path]:
     """Download EarthCARE data files from the given File objects.
@@ -86,7 +86,8 @@ def download(
         unzip: Whether to unzip the downloaded files. Default is True.
         max_workers: Maximum number of concurrent download workers. Default is 5.
         quiet: Whether to disable progress bars during download. Default is False.
-        credentials: Optional tuple of (username, password) for authentication.
+        token: Optional MAAP offline token for authentication. If not provided,
+            checks MAAP_TOKEN env var, then ~/.cache/earthcare_downloader/token.
         force: Whether to force downloading, even if file with the
             same name exists. Default is False.
 
@@ -102,7 +103,7 @@ def download(
             unzip=unzip,
             max_workers=max_workers,
             quiet=quiet,
-            credentials=credentials,
+            token=token,
             force=force,
         )
     )

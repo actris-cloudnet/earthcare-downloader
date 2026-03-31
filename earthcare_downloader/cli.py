@@ -12,7 +12,9 @@ from .products import VALID_PRODUCTS
 
 def main():
     logging.basicConfig(level=logging.INFO)
-    parser = argparse.ArgumentParser(description="Download EarthCARE satellite data.")
+    parser = argparse.ArgumentParser(
+        description="Download EarthCARE satellite data from ESA MAAP."
+    )
     parser.add_argument(
         "-p",
         "--product",
@@ -119,12 +121,12 @@ def main():
         help="Do not unzip downloaded files after download.",
         default=False,
     )
-    # Deprecated --unzip argument kept for backward compatibility
     parser.add_argument(
-        "--unzip",
-        action="store_true",
-        help=argparse.SUPPRESS,
-        default=True,
+        "--token",
+        type=str,
+        help="MAAP offline token for authentication. "
+        "Can also be set via MAAP_TOKEN env var.",
+        default=None,
     )
     parser.add_argument(
         "-q",
@@ -201,6 +203,7 @@ def main():
         dl.search_and_download(
             search_params,
             task_params,
+            token=args.token,
         )
     )
 

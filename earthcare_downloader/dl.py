@@ -2,9 +2,7 @@ import asyncio
 import logging
 import os
 import zipfile
-from contextlib import suppress
 from dataclasses import dataclass
-from getpass import getpass
 from pathlib import Path
 
 import aiohttp
@@ -12,16 +10,13 @@ from platformdirs import user_cache_dir
 from tqdm import tqdm
 
 from earthcare_downloader import metadata
-from earthcare_downloader.html_parser import HTMLParser
 
 from .params import File, SearchParams, TaskParams
 
 logging.basicConfig(level=logging.INFO, format="%(message)s")
 
-FILE_PATH = Path(__file__).resolve().parent
-COOKIE_PATH = (
-    Path(user_cache_dir("earthcare_downloader", ensure_exists=True)) / "cookies.pkl"
-)
+TOKEN_URL = "https://iam.maap.eo.esa.int/realms/esa-maap/protocol/openid-connect/token"
+TOKEN_PATH = Path(user_cache_dir("earthcare_downloader", ensure_exists=True)) / "token"
 
 
 class BarConfig:
@@ -59,6 +54,7 @@ class BarConfig:
 async def search_and_download(
     search_params: SearchParams,
     task_params: TaskParams,
+    token: str | None = None,
 ) -> list[Path]:
     files = await metadata.get_files(search_params)
 
@@ -69,17 +65,21 @@ async def search_and_download(
     if task_params.show:
         files_sorted = sorted(files, key=lambda f: f.frame_start_time)
         header = (
-            f"{'PRODUCT':<11} {'BASELINE':<10} "
+            f"{'PRODUCT':<14} {'BASELINE':<10} {'ORBIT':<7} "
             f"{'FRAME START TIME':<20} {'PROCESSING TIME':<19}"
         )
         logging.info(header)
         logging.info("-" * len(header))
 
         for f in files_sorted:
+            orbit_str = str(f.orbit) if f.orbit is not None else ""
+            proc_str = (
+                f"{f.processing_time:%Y-%m-%d %H:%M:%S}" if f.processing_time else ""
+            )
             logging.info(
-                f"{f.product:<14} {f.baseline:<7} "
+                f"{f.product:<14} {f.baseline:<10} {orbit_str:<7} "
                 f"{f.frame_start_time:%Y-%m-%d %H:%M:%S}  "
-                f"{f.processing_time:%Y-%m-%d %H:%M:%S}"
+                f"{proc_str}"
             )
 
     if not task_params.no_prompt:
@@ -92,7 +92,7 @@ async def search_and_download(
     if not confirmed:
         return []
 
-    return await download_files(files, task_params)
+    return await download_files(files, task_params, token=token)
 
 
 @dataclass
@@ -108,11 +108,11 @@ class DlParams:
 async def download_files(
     files: list[File],
     task_params: TaskParams,
-    credentials: tuple[str, str] | None = None,
+    token: str | None = None,
 ) -> list[Path]:
     _make_folders(task_params, files)
 
-    session = await _init_session(files, credentials)
+    session = await _init_session(token)
     semaphore = asyncio.Semaphore(task_params.max_workers)
     bar_config = BarConfig(len(files), task_params)
 
@@ -215,68 +215,51 @@ async def _download_file(
     params.bar_config.overall.update(1)
 
 
-async def _init_session(
-    files: list[File], credentials: tuple[str, str] | None
-) -> aiohttp.ClientSession:
-    jar = aiohttp.CookieJar()
-    if COOKIE_PATH.exists():
-        jar.load(COOKIE_PATH)
-    session = aiohttp.ClientSession(cookie_jar=jar)
-    servers = {file.server for file in files}
-    for server in servers:
-        try:
-            async with session.get(server) as res:
-                body = await res.text()
-                if "logout" not in body.lower():
-                    logging.info(f"Logging in to {server}")
-                    login_url = f"{server}/access/login"
-                    await _authenticate_session(session, login_url, credentials)
-                    jar.save(COOKIE_PATH)
-        except Exception:
-            await session.close()
-            raise
-    return session
+async def _init_session(token: str | None) -> aiohttp.ClientSession:
+    """Create an authenticated session using OIDC token exchange."""
+    offline_token = _get_offline_token(token)
+    access_token = await _exchange_token(offline_token)
+    return aiohttp.ClientSession(headers={"Authorization": f"Bearer {access_token}"})
 
 
-async def _authenticate_session(
-    session: aiohttp.ClientSession, login_url: str, credentials: tuple[str, str] | None
-) -> None:
-    credentials = credentials or _get_credentials()
-    async with session.get(login_url, auth=aiohttp.BasicAuth(*credentials)) as res:
-        res.raise_for_status()
-        text = await res.text()
-
-    parser = HTMLParser(text)
-    try:
-        auth_url = parser.parse_url()
-    except ValueError:
-        auth_url = login_url
-    payload = {
-        "tocommonauth": "true",
-        "username": credentials[0],
-        "password": credentials[1],
-    }
-    with suppress(ValueError):
-        payload["sessionDataKey"] = parser.parse_session_key()
-
-    async with session.post(auth_url, data=payload) as res:
-        res.raise_for_status()
-        text = await res.text()
-
-    parser = HTMLParser(text)
-    form_url = parser.parse_form_url()
-    data = parser.parse_form_data()
-    async with session.post(form_url, data=data) as res:
-        res.raise_for_status()
+async def _exchange_token(offline_token: str) -> str:
+    """Exchange an offline token for a short-lived access token."""
+    async with (
+        aiohttp.ClientSession() as session,
+        session.post(
+            TOKEN_URL,
+            data={
+                "client_id": "offline-token",
+                "client_secret": "p1eL7uonXs6MDxtGbgKdPVRAmnGxHpVE",
+                "grant_type": "refresh_token",
+                "refresh_token": offline_token,
+            },
+        ) as response,
+    ):
+        response.raise_for_status()
+        data = await response.json()
+        return data["access_token"]
 
 
-def _get_credentials() -> tuple[str, str]:
-    username = os.getenv("ESA_EO_USERNAME")
-    password = os.getenv("ESA_EO_PASSWORD")
-    if username is None or password is None:
-        username = input("ESA EO username: ")
-        password = getpass("ESA EO password: ")
-    return username, password
+def _get_offline_token(token: str | None) -> str:
+    """Get offline token from argument, env var, file, or user prompt."""
+    if token:
+        return token
+
+    env_token = os.getenv("MAAP_TOKEN")
+    if env_token:
+        return env_token
+
+    if TOKEN_PATH.exists():
+        return TOKEN_PATH.read_text().strip()
+
+    logging.info(
+        "No MAAP token found. Get a 90-day offline token from:\n"
+        "https://portal.maap.eo.esa.int/ini/services/auth/token/90dToken.php"
+    )
+    token_input = input("Paste your MAAP token: ").strip()
+    TOKEN_PATH.write_text(token_input)
+    return token_input
 
 
 def _make_folders(task_params: TaskParams, files: list[File]) -> None:
