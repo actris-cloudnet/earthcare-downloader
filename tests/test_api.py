@@ -43,3 +43,25 @@ def test_date_overrides_start_stop():
     files = search(product="CPR_TC__2A", start=start, stop=stop, date=date)
     assert len(files) > 0
     assert len(files) < 200
+
+
+def test_new_esa_l2_products():
+    date = datetime.date(2025, 1, 17)
+    files = search(product="ACM_CAP_2B,ACM_COM_2B,BMA_FLX_2B,ALL_3D__2B", date=date)
+    products_found = {f.product for f in files}
+    assert products_found == {"ACM_CAP_2B", "ACM_COM_2B", "BMA_FLX_2B", "ALL_3D__2B"}
+
+
+def test_aux_data_products():
+    date = datetime.date(2025, 1, 17)
+    files = search(product="GEO_ATTOBS,GEO_ORBOBS,AUX_ORBRES", date=date)
+    products_found = {f.product for f in files}
+    assert "GEO_ATTOBS" in products_found
+    assert "GEO_ORBOBS" in products_found
+
+
+def test_met_data_search():
+    date = datetime.date(2025, 1, 17)
+    files = search(product="AUX_MET_1D", date=date)
+    assert len(files) > 0
+    assert all(f.product == "AUX_MET_1D" for f in files)
