@@ -23,8 +23,6 @@ class TaskParams:
     max_workers: int
     output_path: Path
     by_product: bool
-    unzip: bool
-    show: bool
     quiet: bool | None
     no_prompt: bool
     force: bool

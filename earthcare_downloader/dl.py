@@ -80,25 +80,22 @@ async def search_and_download(
         logger.info("No files found.")
         return []
 
-    if task_params.show:
-        files_sorted = sorted(files, key=lambda f: f.frame_start_time)
-        header = (
-            f"{'PRODUCT':<14} {'BASELINE':<10} {'ORBIT':<7} "
-            f"{'FRAME START TIME':<20} {'PROCESSING TIME':<19}"
-        )
-        logger.info(header)
-        logger.info("-" * len(header))
+    files_sorted = sorted(files, key=lambda f: f.frame_start_time)
+    header = (
+        f"{'PRODUCT':<14} {'BASELINE':<10} {'ORBIT':<7} "
+        f"{'FRAME START TIME':<20} {'PROCESSING TIME':<19}"
+    )
+    logger.info(header)
+    logger.info("-" * len(header))
 
-        for f in files_sorted:
-            orbit_str = str(f.orbit) if f.orbit is not None else ""
-            proc_str = (
-                f"{f.processing_time:%Y-%m-%d %H:%M:%S}" if f.processing_time else ""
-            )
-            logger.info(
-                f"{f.product:<14} {f.baseline:<10} {orbit_str:<7} "
-                f"{f.frame_start_time:%Y-%m-%d %H:%M:%S}  "
-                f"{proc_str}"
-            )
+    for f in files_sorted:
+        orbit_str = str(f.orbit) if f.orbit is not None else ""
+        proc_str = f"{f.processing_time:%Y-%m-%d %H:%M:%S}" if f.processing_time else ""
+        logger.info(
+            f"{f.product:<14} {f.baseline:<10} {orbit_str:<7} "
+            f"{f.frame_start_time:%Y-%m-%d %H:%M:%S}  "
+            f"{proc_str}"
+        )
 
     if not task_params.no_prompt:
         confirmed = input(
@@ -120,7 +117,6 @@ class DlParams:
     auth_session: AuthSession
     semaphore: asyncio.Semaphore
     bar_config: BarConfig
-    unzip: bool
 
 
 async def download_files(
@@ -148,7 +144,6 @@ async def download_files(
                         auth_session=auth_session,
                         semaphore=semaphore,
                         bar_config=bar_config,
-                        unzip=task_params.unzip,
                     )
                 )
             )
@@ -177,11 +172,8 @@ def _files_to_download(
 
         destination = root / Path(file.filename)
 
-        if not task_params.force:
-            if task_params.unzip and destination.with_suffix(".h5").exists():
-                continue
-            if not task_params.unzip and destination.exists():
-                continue
+        if not task_params.force and destination.exists():
+            continue
 
         result.append((file.url, destination))
     return result
@@ -199,7 +191,7 @@ async def _download_with_retries(
                     params,
                     position,
                 )
-                if params.unzip and params.destination.suffix.lower() == ".zip":
+                if params.destination.suffix.lower() == ".zip":
                     with zipfile.ZipFile(params.destination) as zf:
                         extracted = [
                             Path(zf.extract(f, params.destination.parent))

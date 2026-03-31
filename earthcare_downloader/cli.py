@@ -110,18 +110,6 @@ def main():
         help="Maximum number of concurrent downloads (default: 5).",
     )
     parser.add_argument(
-        "--show",
-        action="store_true",
-        help="Show files that would be downloaded.",
-        default=False,
-    )
-    parser.add_argument(
-        "--no-unzip",
-        action="store_true",
-        help="Do not unzip downloaded files after download.",
-        default=False,
-    )
-    parser.add_argument(
         "--token",
         type=str,
         help="MAAP offline token for authentication. "
@@ -192,8 +180,6 @@ def main():
         max_workers=args.max_workers,
         output_path=Path(args.output_path),
         by_product=args.by_product,
-        unzip=not args.no_unzip,
-        show=args.show,
         quiet=args.quiet,
         no_prompt=args.no_prompt,
         force=args.force,

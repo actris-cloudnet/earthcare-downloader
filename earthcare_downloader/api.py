@@ -69,7 +69,6 @@ def download(
     files: list[File],
     output_path: str | Path = Path("."),
     by_product: bool = False,
-    unzip: bool = True,
     max_workers: int = 5,
     quiet: bool | None = None,
     token: str | None = None,
@@ -83,7 +82,6 @@ def download(
             directory.
         by_product: Whether to create subdirectories for each product type.
             Default is False.
-        unzip: Whether to unzip the downloaded files. Default is True.
         max_workers: Maximum number of concurrent download workers. Default is 5.
         quiet: Whether to disable progress bars during download. Default is False.
         token: Optional MAAP offline token for authentication. If not provided,
@@ -100,7 +98,6 @@ def download(
             files=files,
             output_path=output_path,
             by_product=by_product,
-            unzip=unzip,
             max_workers=max_workers,
             quiet=quiet,
             token=token,

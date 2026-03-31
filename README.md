@@ -48,8 +48,6 @@ where the arguments are:
 | `-o`, `--output-path`   | Directory to save downloaded files (default: current directory).                |
 | `--by-product`          | Create subdirectories for each product type.                                    |
 | `--max-workers`         | Maximum number of concurrent downloads (default: **5**).                        |
-| `--show`                | Show filenames before downloading.                                              |
-| `--no-unzip`            | Do not unzip downloaded files. By default the files are unzipped.               |
 | `--token`               | MAAP offline token for authentication.                                          |
 | `-q`, `--quiet`         | Hide progress bars during download.                                             |
 | `--no-prompt`           | Skip confirmation prompt before downloading.                                    |
