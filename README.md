@@ -3,7 +3,7 @@
 [![CI](https://github.com/actris-cloudnet/earthcare-downloader/actions/workflows/test.yml/badge.svg)](https://github.com/actris-cloudnet/earthcare-downloader/actions/workflows/test.yml)
 [![PyPI version](https://badge.fury.io/py/earthcare-downloader.svg)](https://badge.fury.io/py/earthcare-downloader)
 
-A Python tool for searching and downloading [EarthCARE](https://earth.esa.int/eogateway/missions/earthcare) satellite data from the European Space Agency’s (ESA) [Online Dissemination services](https://ec-pdgs-discovery.eo.esa.int/sxcat).
+A Python tool for searching and downloading [EarthCARE](https://earth.esa.int/eogateway/missions/earthcare) satellite data from the European Space Agency's (ESA) [MAAP catalog](https://catalog.maap.eo.esa.int/doc/stac.html).
 
 ## Installation
 
@@ -15,8 +15,13 @@ python3 -m pip install earthcare-downloader
 
 ### Authentication
 
-Store your [ESA EO Sign In](https://eoiam-idp.eo.esa.int/) credentials in the environment variables `ESA_EO_USERNAME` and `ESA_EO_PASSWORD`.
-If these variables are not set, the program will prompt you to enter your credentials.
+Searching for data requires no authentication. Downloading requires a MAAP offline token:
+
+1. Get a 90-day token from https://portal.maap.eo.esa.int/ini/services/auth/token/90dToken.php
+2. Set it via one of these methods:
+   - Environment variable: `export MAAP_TOKEN=your_token`
+   - CLI flag: `--token your_token`
+   - The program will prompt you on first use and cache the token at `~/.cache/earthcare_downloader/token`
 
 ### Running the program
 
@@ -45,6 +50,7 @@ where the arguments are:
 | `--max-workers`         | Maximum number of concurrent downloads (default: **5**).                        |
 | `--show`                | Show filenames before downloading.                                              |
 | `--no-unzip`            | Do not unzip downloaded files. By default the files are unzipped.               |
+| `--token`               | MAAP offline token for authentication.                                          |
 | `-q`, `--quiet`         | Hide progress bars during download.                                             |
 | `--no-prompt`           | Skip confirmation prompt before downloading.                                    |
 | `--all`                 | Download all versions of the file. By default download only the newest version. |
@@ -65,6 +71,7 @@ Available products:
 |                    **Level 2A**                     |                                                                                |                                                  |
 |                                                     | [ATL_AER_2A](https://earthcarehandbook.earth.esa.int/catalogue/atl_aer_2a)     | ATLID Aerosol Parameters                         |
 |                                                     | [ATL_ALD_2A](https://earthcarehandbook.earth.esa.int/catalogue/atl_ald_2a)     | ATLID Aerosol Layer Descriptors                  |
+|                                                     | [ATL_CLA_2A](https://earthcarehandbook.earth.esa.int/catalogue/atl_cla_2a)     | ATLID Cloud and Aerosol Classification           |
 |                                                     | [ATL_CTH_2A](https://earthcarehandbook.earth.esa.int/catalogue/am__cth_2b)     | ATLID Cloud Top Height                           |
 |                                                     | [ATL_EBD_2A](https://earthcarehandbook.earth.esa.int/catalogue/atl_ebd_2a)     | ATLID Extinction, Backscatter and Depolarization |
 |                                                     | [ATL_FM\_\_2A](https://earthcarehandbook.earth.esa.int/catalogue/atl_fm__2a)   | ATLID Feature Mask                               |
@@ -77,27 +84,39 @@ Available products:
 |                                                     | [MSI_AOT_2A](https://earthcarehandbook.earth.esa.int/catalogue/msi_aot_2a)     | MSI Aerosol Optical Thickness                    |
 |                                                     | [MSI_CM\_\_2A](https://earthcarehandbook.earth.esa.int/catalogue/msi_cm__2a)   | MSI Cloud Mask                                   |
 |                                                     | [MSI_COP_2A](https://earthcarehandbook.earth.esa.int/catalogue/msi_cop_2a)     | MSI Cloud Optical Properties                     |
-| <span title="JAXA product">:japanese_castle:</span> | [ATL_CLA_2A](https://eolp.jaxa.jp/EarthCARE_ATLID_L2A_ATL_CLA.html)            | ATLID Cloud and Aerosol Classification           |
 | <span title="JAXA product">:japanese_castle:</span> | [CPR_CLP_2A](https://eolp.jaxa.jp/EarthCARE_CPR_L2A_CPR_CLP.html)              | CPR Cloud Properties                             |
 | <span title="JAXA product">:japanese_castle:</span> | [CPR_ECO_2A](https://eolp.jaxa.jp/EarthCARE_CPR_L2A_CPR_ECO.html)              | CPR Echo Characteristics                         |
 | <span title="JAXA product">:japanese_castle:</span> | [MSI_CLP_2A](https://eolp.jaxa.jp/EarthCARE_MSI_L2A_MSI_CLP.html)              | MSI Cloud Properties                             |
 |                    **Level 2B**                     |                                                                                |                                                  |
+|                                                     | [ACM_CAP_2B](https://earthcarehandbook.earth.esa.int/catalogue/acm_cap_2b)     | ACM Closure Assessment Parameters                |
+|                                                     | [ACM_COM_2B](https://earthcarehandbook.earth.esa.int/catalogue/acm_com_2b)     | ACM Composite Products                           |
+|                                                     | [ACM_RT\_\_2B](https://earthcarehandbook.earth.esa.int/catalogue/acm_rt__2b)   | ACM Radiative Transfer                           |
+|                                                     | [AC\_\_CLP_2B](https://earthcarehandbook.earth.esa.int/catalogue/ac__clp_2b)   | ATLID-CPR Synergy Cloud Properties               |
 |                                                     | [AC\_\_TC\_\_2B](https://earthcarehandbook.earth.esa.int/catalogue/ac__tc__2b) | ATLID-CPR Target Classification                  |
+|                                                     | [ALL_3D\_\_2B](https://earthcarehandbook.earth.esa.int/catalogue/all_3d__2b)   | Combined 3D Scene                                |
+|                                                     | [ALL_DF\_\_2B](https://earthcarehandbook.earth.esa.int/catalogue/all_df__2b)   | Combined Broadband Radiative Fluxes              |
 |                                                     | [AM\_\_ACD_2B](https://earthcarehandbook.earth.esa.int/catalogue/am__acd_2b)   | ATLID-MSI Aerosol Column Descriptors             |
 |                                                     | [AM\_\_CTH_2B](https://earthcarehandbook.earth.esa.int/catalogue/am__cth_2b)   | ATLID-MSI Cloud Top Height                       |
+|                                                     | [BMA_FLX_2B](https://earthcarehandbook.earth.esa.int/catalogue/bma_flx_2b)     | BBR-MSI-ATLID Radiative Fluxes                   |
 |                                                     | [BM\_\_RAD_2B](https://earthcarehandbook.earth.esa.int/catalogue/bm__rad_2b)   | BBR-MSI Radiative Fluxes and Heating Rates       |
-| <span title="JAXA product">:japanese_castle:</span> | [AC\_\_CLP_2B](https://eolp.jaxa.jp/EarthCARE_L2B_AC__CLP.html)                | CPR-ATLID Synergy Cloud Properties               |
+| <span title="JAXA product">:japanese_castle:</span> | [ACM_CLP_2B](https://eolp.jaxa.jp/EarthCARE_L2B_ACM_CLP.html)                  | ACM Cloud Properties                             |
+| <span title="JAXA product">:japanese_castle:</span> | [ALL_RAD_2B](https://eolp.jaxa.jp/EarthCARE_L2B_ALL_RAD.html)                  | Combined Radiance                                |
 |                   **Orbit Data**                    |                                                                                |                                                  |
 |                                                     | [AUX_ORBPRE](https://earthcarehandbook.earth.esa.int/catalogue/aux_orbpre)     | Orbit Predictions                                |
 |                                                     | [MPL_ORBSCT](https://earthcarehandbook.earth.esa.int/catalogue/mpl_orbsct)     | Orbit Scenario                                   |
 |                    **MET Data**                     |                                                                                |                                                  |
 |                                                     | [AUX_MET_1D](https://earthcarehandbook.earth.esa.int/catalogue/aux_met_1d)     | ECMWF meteorological parameters                  |
+|                 **Auxiliary Data**                  |                                                                                |                                                  |
+|                                                     | AUX_ORBRES                                                                     | Orbit Restitution                                |
+|                                                     | BBR_SOL_1B                                                                     | BBR Solar Calibration                            |
+|                                                     | GEO_ATTOBS                                                                     | Attitude Observations                            |
+|                                                     | GEO_ORBOBS                                                                     | Orbit Observations                               |
 
 <span title="JAXA product">:japanese_castle:</span> = [JAXA](https://www.eorc.jaxa.jp/EARTHCARE/) product
 
 ### Examples
 
-Download all `CPR_TC__2A` overpass data within 5 km of Hyytiälä, Finland:
+Download all `CPR_TC__2A` overpass data within 5 km of Hyytiala, Finland:
 
 ```bash
 earthcare-downloader -p CPR_TC__2A --lat 61.844 --lon 24.287 -r 5
@@ -131,12 +150,12 @@ paths = await download(files)
 
 ## Disclaimer
 
-This package provides tools to access data from the European Space Agency’s (ESA)
-Online Dissemination services. The package does not host or redistribute ESA data.
+This package provides tools to access data from the European Space Agency's (ESA)
+MAAP catalog. The package does not host or redistribute ESA data.
 
 All data are &copy; European Space Agency (ESA) and subject to the
-[ESA Online Dissemination Terms and Conditions](https://earth.esa.int/eogateway/terms-and-conditions).
-Please ensure your use complies with ESA’s non-commercial and attribution requirements.
+[ESA Terms and Conditions](https://earth.esa.int/eogateway/terms-and-conditions).
+Please ensure your use complies with ESA's non-commercial and attribution requirements.
 
 ## License
 
