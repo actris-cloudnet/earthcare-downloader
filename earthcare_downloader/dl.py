@@ -2,7 +2,7 @@ import asyncio
 import logging
 import os
 import zipfile
-from dataclasses import dataclass
+from dataclasses import dataclass, field
 from pathlib import Path
 
 import aiohttp
@@ -17,6 +17,24 @@ logger = logging.getLogger(__name__)
 
 TOKEN_URL = "https://iam.maap.eo.esa.int/realms/esa-maap/protocol/openid-connect/token"
 TOKEN_PATH = Path(user_cache_dir("earthcare_downloader", ensure_exists=True)) / "token"
+
+
+@dataclass
+class AuthSession:
+    """Holds an aiohttp session with automatic token refresh on 401."""
+
+    session: aiohttp.ClientSession
+    offline_token: str
+    _lock: asyncio.Lock = field(default_factory=asyncio.Lock)
+    _current_token: str = ""
+
+    async def refresh(self, failed_token: str) -> None:
+        """Re-exchange the offline token if it hasn't been refreshed already."""
+        async with self._lock:
+            if self._current_token != failed_token:
+                return  # Another task already refreshed
+            self._current_token = await _exchange_token(self.offline_token)
+            self.session.headers["Authorization"] = f"Bearer {self._current_token}"
 
 
 class BarConfig:
@@ -99,7 +117,7 @@ async def search_and_download(
 class DlParams:
     url: str
     destination: Path
-    session: aiohttp.ClientSession
+    auth_session: AuthSession
     semaphore: asyncio.Semaphore
     bar_config: BarConfig
     unzip: bool
@@ -116,18 +134,18 @@ async def download_files(
     if not to_download:
         return []
 
-    session = await _init_session(token)
+    auth_session = await _init_session(token)
     semaphore = asyncio.Semaphore(task_params.max_workers)
     bar_config = BarConfig(len(to_download), task_params)
 
-    async with session:
+    async with auth_session.session:
         tasks = [
             asyncio.create_task(
                 _download_with_retries(
                     DlParams(
                         url=url,
                         destination=dest,
-                        session=session,
+                        auth_session=auth_session,
                         semaphore=semaphore,
                         bar_config=bar_config,
                         unzip=task_params.unzip,
@@ -207,36 +225,49 @@ async def _download_file(
     params: DlParams,
     position: int,
 ) -> None:
-    async with params.semaphore, params.session.get(params.url) as response:
-        response.raise_for_status()
-        bar = tqdm(
-            desc=params.destination.name,
-            total=response.content_length,
-            unit="iB",
-            unit_scale=True,
-            unit_divisor=1024,
-            disable=params.bar_config.quiet,
-            position=position,
-            leave=False,
-            colour="cyan",
-        )
+    async with params.semaphore:
+        response = await params.auth_session.session.get(params.url)
+        if response.status == 401:
+            failed_token = params.auth_session._current_token
+            response.release()
+            logger.info("Access token expired, refreshing...")
+            await params.auth_session.refresh(failed_token)
+            response = await params.auth_session.session.get(params.url)
         try:
-            with params.destination.open("wb") as f:
-                while chunk := await response.content.read(65536):
-                    f.write(chunk)
-                    bar.update(len(chunk))
-                    params.bar_config.total_amount.update(len(chunk))
+            response.raise_for_status()
+            bar = tqdm(
+                desc=params.destination.name,
+                total=response.content_length,
+                unit="iB",
+                unit_scale=True,
+                unit_divisor=1024,
+                disable=params.bar_config.quiet,
+                position=position,
+                leave=False,
+                colour="cyan",
+            )
+            try:
+                with params.destination.open("wb") as f:
+                    while chunk := await response.content.read(65536):
+                        f.write(chunk)
+                        bar.update(len(chunk))
+                        params.bar_config.total_amount.update(len(chunk))
+            finally:
+                bar.close()
+                bar.clear()
         finally:
-            bar.close()
-            bar.clear()
+            response.release()
     params.bar_config.overall.update(1)
 
 
-async def _init_session(token: str | None) -> aiohttp.ClientSession:
+async def _init_session(token: str | None) -> AuthSession:
     """Create an authenticated session using OIDC token exchange."""
     offline_token = _get_offline_token(token)
     access_token = await _exchange_token(offline_token)
-    return aiohttp.ClientSession(headers={"Authorization": f"Bearer {access_token}"})
+    session = aiohttp.ClientSession(headers={"Authorization": f"Bearer {access_token}"})
+    return AuthSession(
+        session=session, offline_token=offline_token, _current_token=access_token
+    )
 
 
 async def _exchange_token(offline_token: str) -> str:
@@ -276,6 +307,7 @@ def _get_offline_token(token: str | None) -> str:
     )
     token_input = input("Paste your MAAP token: ").strip()
     TOKEN_PATH.write_text(token_input)
+    TOKEN_PATH.chmod(0o600)
     return token_input
 
 
