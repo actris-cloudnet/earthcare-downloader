@@ -9,11 +9,10 @@ import aiohttp
 from earthcare_downloader import utils
 
 from .params import File, SearchParams
-from .products import PRODUCT_TO_COLLECTIONS
+from .products import COLLECTIONS_WITHOUT_ORBIT, PRODUCT_TO_COLLECTIONS
 
 BASE_URL = "https://catalog.maap.eo.esa.int/catalogue"
-
-_COLLECTIONS_WITHOUT_ORBIT = {"EarthCAREOrbitData_MAAP", "EarthCAREAuxiliary_MAAP"}
+_STAC_DATETIME_FMT = "%Y-%m-%dT%H:%M:%S.%fZ"
 
 
 async def get_files(params: SearchParams) -> list[File]:
@@ -23,7 +22,7 @@ async def get_files(params: SearchParams) -> list[File]:
     collection_products: dict[str, list[str]] = defaultdict(list)
     for product in params.product:
         for collection in PRODUCT_TO_COLLECTIONS.get(product, []):
-            if has_orbit_filter and collection in _COLLECTIONS_WITHOUT_ORBIT:
+            if has_orbit_filter and collection in COLLECTIONS_WITHOUT_ORBIT:
                 continue
             collection_products[collection].append(product)
 
@@ -51,15 +50,13 @@ def _create_file(feature: dict) -> File:
     url = asset["href"]
     filename = Path(url).name
 
-    frame_start_time = datetime.datetime.strptime(
-        props["datetime"], "%Y-%m-%dT%H:%M:%S.%fZ"
-    )
+    frame_start_time = datetime.datetime.strptime(props["datetime"], _STAC_DATETIME_FMT)
 
     processing_time = None
     if "processing:datetime" in props and props["processing:datetime"]:
         with contextlib.suppress(ValueError, TypeError):
             processing_time = datetime.datetime.strptime(
-                props["processing:datetime"], "%Y-%m-%dT%H:%M:%S.%fZ"
+                props["processing:datetime"], _STAC_DATETIME_FMT
             )
 
     return File(
@@ -109,14 +106,12 @@ async def _fetch_items(
 
     items.extend(data.get("features", []))
 
-    next_link = _find_next_link(data.get("links", []))
-    while next_link is not None:
+    while next_link := _find_next_link(data.get("links", [])):
         async with session.get(next_link["href"]) as response:
             response.raise_for_status()
             data = await response.json()
 
         items.extend(data.get("features", []))
-        next_link = _find_next_link(data.get("links", []))
 
     return items
 
@@ -137,7 +132,7 @@ def _build_search_body(
     if bbox is not None:
         body["bbox"] = bbox
 
-    has_orbit = collection not in _COLLECTIONS_WITHOUT_ORBIT
+    has_orbit = collection not in COLLECTIONS_WITHOUT_ORBIT
     cql_filter = _build_cql_filter(products, params, has_orbit=has_orbit)
     if cql_filter:
         body["filter"] = cql_filter
@@ -191,7 +186,4 @@ def _build_cql_filter(
 
 
 def _find_next_link(links: list[dict]) -> dict | None:
-    for link in links:
-        if link.get("rel") == "next":
-            return link
-    return None
+    return next((link for link in links if link.get("rel") == "next"), None)

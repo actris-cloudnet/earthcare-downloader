@@ -73,14 +73,6 @@ Product: TypeAlias = ESAProd | JAXAProd | OrbitData | MetData | AuxData
 ProductInput: TypeAlias = str | Product
 ProductsInput: TypeAlias = ProductInput | Iterable[ProductInput]
 
-VALID_PRODUCTS = (
-    {e.value for e in ESAProd}
-    | {e.value for e in JAXAProd}
-    | {e.value for e in OrbitData}
-    | {e.value for e in MetData}
-    | {e.value for e in AuxData}
-)
-
 _COLLECTION_PRODUCTS: dict[str, list[str]] = {
     "EarthCAREL1Validated_MAAP": [
         "ATL_NOM_1B",
@@ -148,3 +140,7 @@ PRODUCT_TO_COLLECTIONS: dict[str, list[str]] = defaultdict(list)
 for _collection, _products in _COLLECTION_PRODUCTS.items():
     for _product in _products:
         PRODUCT_TO_COLLECTIONS[_product].append(_collection)
+
+VALID_PRODUCTS: set[str] = set(PRODUCT_TO_COLLECTIONS.keys())
+
+COLLECTIONS_WITHOUT_ORBIT = {"EarthCAREOrbitData_MAAP", "EarthCAREAuxiliary_MAAP"}
