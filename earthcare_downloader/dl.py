@@ -13,7 +13,7 @@ from earthcare_downloader import metadata
 
 from .params import File, SearchParams, TaskParams
 
-logging.basicConfig(level=logging.INFO, format="%(message)s")
+logger = logging.getLogger(__name__)
 
 TOKEN_URL = "https://iam.maap.eo.esa.int/realms/esa-maap/protocol/openid-connect/token"
 TOKEN_PATH = Path(user_cache_dir("earthcare_downloader", ensure_exists=True)) / "token"
@@ -59,7 +59,7 @@ async def search_and_download(
     files = await metadata.get_files(search_params)
 
     if not files:
-        logging.info("No files found.")
+        logger.info("No files found.")
         return []
 
     if task_params.show:
@@ -68,15 +68,15 @@ async def search_and_download(
             f"{'PRODUCT':<14} {'BASELINE':<10} {'ORBIT':<7} "
             f"{'FRAME START TIME':<20} {'PROCESSING TIME':<19}"
         )
-        logging.info(header)
-        logging.info("-" * len(header))
+        logger.info(header)
+        logger.info("-" * len(header))
 
         for f in files_sorted:
             orbit_str = str(f.orbit) if f.orbit is not None else ""
             proc_str = (
                 f"{f.processing_time:%Y-%m-%d %H:%M:%S}" if f.processing_time else ""
             )
-            logging.info(
+            logger.info(
                 f"{f.product:<14} {f.baseline:<10} {orbit_str:<7} "
                 f"{f.frame_start_time:%Y-%m-%d %H:%M:%S}  "
                 f"{proc_str}"
@@ -112,37 +112,32 @@ async def download_files(
 ) -> list[Path]:
     _make_folders(task_params, files)
 
+    to_download = _files_to_download(files, task_params)
+    if not to_download:
+        return []
+
     session = await _init_session(token)
     semaphore = asyncio.Semaphore(task_params.max_workers)
-    bar_config = BarConfig(len(files), task_params)
+    bar_config = BarConfig(len(to_download), task_params)
 
     async with session:
-        tasks = []
-        for file in files:
-            root = task_params.output_path
-            if task_params.by_product:
-                root /= file.product
-
-            destination = root / Path(file.filename)
-
-            if not task_params.force:
-                if task_params.unzip and destination.with_suffix(".h5").exists():
-                    continue
-                if not task_params.unzip and destination.exists():
-                    continue
-
-            dl_stuff = DlParams(
-                url=file.url,
-                destination=destination,
-                session=session,
-                semaphore=semaphore,
-                bar_config=bar_config,
-                unzip=task_params.unzip,
+        tasks = [
+            asyncio.create_task(
+                _download_with_retries(
+                    DlParams(
+                        url=url,
+                        destination=dest,
+                        session=session,
+                        semaphore=semaphore,
+                        bar_config=bar_config,
+                        unzip=task_params.unzip,
+                    )
+                )
             )
-            task = asyncio.create_task(_download_with_retries(dl_stuff))
-            tasks.append(task)
+            for url, dest in to_download
+        ]
         if task_params.quiet is True:
-            print(f"Downloading {len(files)} files...", end="", flush=True)
+            print(f"Downloading {len(to_download)} files...", end="", flush=True)
         full_paths = await asyncio.gather(*tasks)
         if task_params.quiet is True:
             print(" done.", flush=True)
@@ -150,6 +145,28 @@ async def download_files(
         bar_config.overall.clear()
 
     return [path for paths in full_paths for path in paths]
+
+
+def _files_to_download(
+    files: list[File], task_params: TaskParams
+) -> list[tuple[str, Path]]:
+    """Return (url, destination) pairs for files that need downloading."""
+    result: list[tuple[str, Path]] = []
+    for file in files:
+        root = task_params.output_path
+        if task_params.by_product:
+            root /= file.product
+
+        destination = root / Path(file.filename)
+
+        if not task_params.force:
+            if task_params.unzip and destination.with_suffix(".h5").exists():
+                continue
+            if not task_params.unzip and destination.exists():
+                continue
+
+        result.append((file.url, destination))
+    return result
 
 
 async def _download_with_retries(
@@ -174,16 +191,16 @@ async def _download_with_retries(
                     return extracted
                 return [params.destination]
             except aiohttp.ClientError as e:
-                logging.warning(f"Attempt {attempt} failed for {params.url}: {e}")
+                logger.warning(f"Attempt {attempt} failed for {params.url}: {e}")
                 if attempt == max_retries:
-                    logging.error(
+                    logger.error(
                         f"Giving up on {params.url} after {max_retries} attempts."
                     )
                     raise
                 await asyncio.sleep(2**attempt)
     finally:
         params.bar_config.position_queue.put_nowait(position)
-    raise RuntimeError("Unreachable code reached.")
+    raise AssertionError
 
 
 async def _download_file(
@@ -205,7 +222,7 @@ async def _download_file(
         )
         try:
             with params.destination.open("wb") as f:
-                while chunk := await response.content.read(8192):
+                while chunk := await response.content.read(65536):
                     f.write(chunk)
                     bar.update(len(chunk))
                     params.bar_config.total_amount.update(len(chunk))
@@ -253,7 +270,7 @@ def _get_offline_token(token: str | None) -> str:
     if TOKEN_PATH.exists():
         return TOKEN_PATH.read_text().strip()
 
-    logging.info(
+    logger.info(
         "No MAAP token found. Get a 90-day offline token from:\n"
         "https://portal.maap.eo.esa.int/ini/services/auth/token/90dToken.php"
     )

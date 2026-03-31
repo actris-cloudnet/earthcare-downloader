@@ -18,26 +18,27 @@ def main():
     parser.add_argument(
         "-p",
         "--product",
-        help=f"Product type to download. Choose from: {', '.join(VALID_PRODUCTS)}.",
-        type=lambda product: utils.validate_products(product),
+        help="Product type to download. Choose from: "
+        f"{', '.join(sorted(VALID_PRODUCTS))}.",
+        type=utils.validate_products,
         required=True,
     )
     parser.add_argument(
         "--start",
-        type=lambda s: utils.str2date(s),
+        type=utils.str2date,
         help="Start date (inclusive) for data search in YYYY-MM-DD format.",
         default=utils.MISSION_START,
     )
     parser.add_argument(
         "--stop",
-        type=lambda s: utils.str2date(s),
+        type=utils.str2date,
         help="Stop date (inclusive) for data search in YYYY-MM-DD format.",
         default=utils.utctoday(),
     )
     parser.add_argument(
         "-d",
         "--date",
-        type=lambda s: utils.str2date(s),
+        type=utils.str2date,
         help="Single date for data search in YYYY-MM-DD format. "
         "Can be used instead of --start and --stop.",
         default=None,
@@ -77,7 +78,6 @@ def main():
         help="Distance [km] from the location to search for data. "
         "Use with --lat and --lon.",
     )
-    # add lat_range and lon_range arguments
     parser.add_argument(
         "--lat-range",
         type=lambda s: tuple(map(float, s.split(","))),
