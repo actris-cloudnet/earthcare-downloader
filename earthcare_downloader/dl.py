@@ -111,7 +111,6 @@ async def download_files(
     task_params: TaskParams,
     token: str | None = None,
 ) -> list[Path]:
-    _make_folders(task_params, files)
     to_download = _files_to_download(files, task_params)
     if not to_download:
         return []
@@ -123,6 +122,9 @@ async def _download(
     task_params: TaskParams,
     token: str | None = None,
 ) -> list[Path]:
+    for _, dest, _ in to_download:
+        dest.parent.mkdir(parents=True, exist_ok=True)
+
     auth_session = await _init_session(token)
     semaphore = asyncio.Semaphore(task_params.max_workers)
     sizes = [size for _, _, size in to_download if size is not None]
@@ -324,11 +326,3 @@ def _get_offline_token(token: str | None) -> str:
     TOKEN_PATH.write_text(token_input)
     TOKEN_PATH.chmod(0o600)
     return token_input
-
-
-def _make_folders(task_params: TaskParams, files: list[File]) -> None:
-    task_params.output_path.mkdir(parents=True, exist_ok=True)
-    products = {file.product for file in files}
-    if task_params.by_product:
-        for product in products:
-            (task_params.output_path / product).mkdir(exist_ok=True)
