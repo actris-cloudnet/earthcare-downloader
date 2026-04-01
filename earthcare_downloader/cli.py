@@ -62,6 +62,12 @@ def main():
         default=None,
     )
     parser.add_argument(
+        "--baseline",
+        type=str,
+        help="Filter by processing baseline (e.g. BA).",
+        default=None,
+    )
+    parser.add_argument(
         "--lat",
         type=float,
         help="Latitude of the location to download data for.",
@@ -174,6 +180,7 @@ def main():
         stop=args.stop,
         orbit_min=args.orbit_min,
         orbit_max=args.orbit_max or utils.MAX_ORBITS,
+        baseline=args.baseline,
         all=args.all,
     )
 

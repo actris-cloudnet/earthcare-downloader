@@ -21,6 +21,7 @@ async def search(
     radius: float | None = None,
     lat_range: tuple[float, float] | None = None,
     lon_range: tuple[float, float] | None = None,
+    baseline: str | None = None,
     all: bool = False,
 ) -> list[File]:
     if start is None:
@@ -56,6 +57,7 @@ async def search(
         stop=stop,
         orbit_min=orbit_min,
         orbit_max=orbit_max or utils.MAX_ORBITS,
+        baseline=baseline,
         all=all,
     )
     return await get_files(search_params)

@@ -182,6 +182,9 @@ def _build_cql_filter(
         if params.orbit_max < utils.MAX_ORBITS:
             parts.append(f'"sat:absolute_orbit" <= {params.orbit_max}')
 
+    if params.baseline:
+        parts.append(f"\"version\"='{params.baseline}'")
+
     return " AND ".join(parts)
 
 

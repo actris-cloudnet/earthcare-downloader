@@ -15,6 +15,7 @@ class SearchParams:
     stop: datetime.date
     orbit_min: int
     orbit_max: int
+    baseline: str | None
     all: bool
 
 

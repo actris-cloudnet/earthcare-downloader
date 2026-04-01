@@ -65,3 +65,13 @@ def test_met_data_search():
     files = search(product="AUX_MET_1D", date=date)
     assert len(files) > 0
     assert all(f.product == "AUX_MET_1D" for f in files)
+
+
+def test_baseline_filter():
+    date = datetime.date(2024, 9, 1)
+    files_da = search(product="CPR_NOM_1B", date=date, baseline="DA")
+    files_ca = search(product="CPR_NOM_1B", date=date, baseline="CA")
+    assert len(files_da) > 0
+    assert len(files_ca) > 0
+    assert all(f.baseline == "DA" for f in files_da)
+    assert all(f.baseline == "CA" for f in files_ca)

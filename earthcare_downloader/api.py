@@ -20,6 +20,7 @@ def search(
     radius: float | None = None,
     lat_range: tuple[float, float] | None = None,
     lon_range: tuple[float, float] | None = None,
+    baseline: str | None = None,
     all: bool = False,
 ) -> list[File]:
     """Search for EarthCARE data files matching the given parameters.
@@ -40,6 +41,8 @@ def search(
             Use with lon_range.
         lon_range: Tuple specifying the longitude range (min_lon, max_lon).
             Use with lat_range.
+        baseline: Filter by processing baseline (e.g. "BA"). Default is None
+            (all baselines, keeping newest).
         all: Whether to search for all versions (different baselines and/or
             processing runs) of the product. Default is False.
 
@@ -60,6 +63,7 @@ def search(
             radius,
             lat_range,
             lon_range,
+            baseline,
             all,
         )
     )
