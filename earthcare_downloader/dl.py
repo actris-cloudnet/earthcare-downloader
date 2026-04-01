@@ -165,7 +165,11 @@ def _files_to_download(
 
         destination = root / Path(file.filename)
 
-        if not task_params.force and destination.exists():
+        if (
+            not task_params.force
+            and destination.exists()
+            and (file.file_size is None or destination.stat().st_size == file.file_size)
+        ):
             continue
 
         result.append((file.url, destination, file.file_size))
