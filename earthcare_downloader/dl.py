@@ -71,26 +71,21 @@ async def search_and_download(
         print("No files found.")
         return []
 
-    files_sorted = sorted(files, key=lambda f: f.frame_start_time)
-    header = (
-        f"{'PRODUCT':<14} {'BASELINE':<10} {'ORBIT':<7} "
-        f"{'FRAME START TIME':<20} {'PROCESSING TIME':<19}"
-    )
-    print(header)
-    print("-" * len(header))
+    _print_file_table(files)
 
-    for f in files_sorted:
-        orbit_str = str(f.orbit) if f.orbit is not None else ""
-        proc_str = f"{f.processing_time:%Y-%m-%d %H:%M:%S}" if f.processing_time else ""
-        print(
-            f"{f.product:<14} {f.baseline:<10} {orbit_str:<7} "
-            f"{f.frame_start_time:%Y-%m-%d %H:%M:%S}  "
-            f"{proc_str}"
-        )
+    to_download = _files_to_download(files, task_params)
+    n_skip = len(files) - len(to_download)
+
+    if not to_download:
+        print(f"All {len(files)} files already exist.")
+        return []
+
+    if n_skip > 0:
+        print(f"{n_skip} files already exist, {len(to_download)} to download.")
 
     if not task_params.yes:
         confirmed = input(
-            f"Proceed with downloading {len(files)} files? [y/n]: "
+            f"Proceed with downloading {len(to_download)} files? [y/n]: "
         ).strip().lower() in ("y", "yes")
     else:
         confirmed = True
@@ -98,7 +93,7 @@ async def search_and_download(
     if not confirmed:
         return []
 
-    return await download_files(files, task_params, token=token)
+    return await _download(to_download, task_params, token=token)
 
 
 @dataclass
@@ -116,11 +111,17 @@ async def download_files(
     token: str | None = None,
 ) -> list[Path]:
     _make_folders(task_params, files)
-
     to_download = _files_to_download(files, task_params)
     if not to_download:
         return []
+    return await _download(to_download, task_params, token=token)
 
+
+async def _download(
+    to_download: list[tuple[str, Path, int | None]],
+    task_params: TaskParams,
+    token: str | None = None,
+) -> list[Path]:
     auth_session = await _init_session(token)
     semaphore = asyncio.Semaphore(task_params.max_workers)
     sizes = [size for _, _, size in to_download if size is not None]
@@ -151,6 +152,24 @@ async def download_files(
         bar_config.overall.clear()
 
     return [path for paths in full_paths for path in paths]
+
+
+def _print_file_table(files: list[File]) -> None:
+    files_sorted = sorted(files, key=lambda f: f.frame_start_time)
+    header = (
+        f"{'PRODUCT':<14} {'BASELINE':<10} {'ORBIT':<7} "
+        f"{'FRAME START TIME':<20} {'PROCESSING TIME':<19}"
+    )
+    print(header)
+    print("-" * len(header))
+    for f in files_sorted:
+        orbit_str = str(f.orbit) if f.orbit is not None else ""
+        proc_str = f"{f.processing_time:%Y-%m-%d %H:%M:%S}" if f.processing_time else ""
+        print(
+            f"{f.product:<14} {f.baseline:<10} {orbit_str:<7} "
+            f"{f.frame_start_time:%Y-%m-%d %H:%M:%S}  "
+            f"{proc_str}"
+        )
 
 
 def _files_to_download(
