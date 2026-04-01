@@ -38,33 +38,24 @@ class AuthSession:
 
 
 class BarConfig:
-    def __init__(self, n_data: int, task_params: TaskParams) -> None:
+    def __init__(self, total_bytes: int | None, task_params: TaskParams) -> None:
         self.quiet = task_params.quiet
         self.position_queue = self._init_position_queue(task_params.max_workers)
-        self.total_amount = tqdm(
-            total=0,
-            desc="Total amount",
+        self.overall = tqdm(
+            total=total_bytes,
+            desc="Total progress",
             unit="iB",
             unit_scale=True,
             unit_divisor=1024,
             disable=self.quiet,
             position=0,
-            leave=False,
-        )
-        self.overall = tqdm(
-            total=n_data,
-            desc="Total file progress",
-            unit="file",
-            disable=self.quiet,
-            position=1,
             colour="green",
             leave=False,
         )
-        self.lock = asyncio.Lock()
 
     def _init_position_queue(self, max_workers: int) -> asyncio.Queue:
         queue: asyncio.Queue = asyncio.Queue()
-        for i in range(2, max_workers + 2):
+        for i in range(1, max_workers + 1):
             queue.put_nowait(i)
         return queue
 
@@ -132,7 +123,9 @@ async def download_files(
 
     auth_session = await _init_session(token)
     semaphore = asyncio.Semaphore(task_params.max_workers)
-    bar_config = BarConfig(len(to_download), task_params)
+    sizes = [size for _, _, size in to_download if size is not None]
+    total_bytes = sum(sizes) if len(sizes) == len(to_download) else None
+    bar_config = BarConfig(total_bytes, task_params)
 
     async with auth_session.session:
         tasks = [
@@ -147,7 +140,7 @@ async def download_files(
                     )
                 )
             )
-            for url, dest in to_download
+            for url, dest, _ in to_download
         ]
         if task_params.quiet is True:
             print(f"Downloading {len(to_download)} files...", end="", flush=True)
@@ -162,9 +155,9 @@ async def download_files(
 
 def _files_to_download(
     files: list[File], task_params: TaskParams
-) -> list[tuple[str, Path]]:
-    """Return (url, destination) pairs for files that need downloading."""
-    result: list[tuple[str, Path]] = []
+) -> list[tuple[str, Path, int | None]]:
+    """Return (url, destination, file_size) tuples for files that need downloading."""
+    result: list[tuple[str, Path, int | None]] = []
     for file in files:
         root = task_params.output_path
         if task_params.by_product:
@@ -175,7 +168,7 @@ def _files_to_download(
         if not task_params.force and destination.exists():
             continue
 
-        result.append((file.url, destination))
+        result.append((file.url, destination, file.file_size))
     return result
 
 
@@ -246,7 +239,7 @@ async def _download_file(
                     while chunk := await response.content.read(65536):
                         f.write(chunk)
                         bar.update(len(chunk))
-                        params.bar_config.total_amount.update(len(chunk))
+                        params.bar_config.overall.update(len(chunk))
                 part_path.rename(params.destination)
             except BaseException:
                 part_path.unlink(missing_ok=True)
@@ -256,7 +249,6 @@ async def _download_file(
                 bar.clear()
         finally:
             response.release()
-    params.bar_config.overall.update(1)
 
 
 async def _init_session(token: str | None) -> AuthSession:
