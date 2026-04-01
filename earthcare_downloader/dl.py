@@ -71,7 +71,8 @@ async def search_and_download(
         print("No files found.")
         return []
 
-    _print_file_table(files)
+    if task_params.quiet is not True:
+        _print_file_table(files)
 
     to_download = _files_to_download(files, task_params)
     n_skip = len(files) - len(to_download)
