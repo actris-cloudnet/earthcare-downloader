@@ -238,12 +238,19 @@ async def _download_file(
                 leave=False,
                 colour="cyan",
             )
+            part_path = params.destination.with_suffix(
+                params.destination.suffix + ".part"
+            )
             try:
-                with params.destination.open("wb") as f:
+                with part_path.open("wb") as f:
                     while chunk := await response.content.read(65536):
                         f.write(chunk)
                         bar.update(len(chunk))
                         params.bar_config.total_amount.update(len(chunk))
+                part_path.rename(params.destination)
+            except BaseException:
+                part_path.unlink(missing_ok=True)
+                raise
             finally:
                 bar.close()
                 bar.clear()
