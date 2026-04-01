@@ -68,7 +68,7 @@ async def search_and_download(
     files = await metadata.get_files(search_params)
 
     if not files:
-        logger.info("No files found.")
+        print("No files found.")
         return []
 
     files_sorted = sorted(files, key=lambda f: f.frame_start_time)
@@ -76,13 +76,13 @@ async def search_and_download(
         f"{'PRODUCT':<14} {'BASELINE':<10} {'ORBIT':<7} "
         f"{'FRAME START TIME':<20} {'PROCESSING TIME':<19}"
     )
-    logger.info(header)
-    logger.info("-" * len(header))
+    print(header)
+    print("-" * len(header))
 
     for f in files_sorted:
         orbit_str = str(f.orbit) if f.orbit is not None else ""
         proc_str = f"{f.processing_time:%Y-%m-%d %H:%M:%S}" if f.processing_time else ""
-        logger.info(
+        print(
             f"{f.product:<14} {f.baseline:<10} {orbit_str:<7} "
             f"{f.frame_start_time:%Y-%m-%d %H:%M:%S}  "
             f"{proc_str}"
