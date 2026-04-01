@@ -73,9 +73,9 @@ def _create_file(feature: dict) -> File:
 
 
 def _parse_newest_file_versions(files: list[File]) -> list[File]:
-    files_filtered: dict[str, File] = {}
+    files_filtered: dict[tuple[str, datetime.datetime], File] = {}
     for f in files:
-        key = f.identifier
+        key = (f.product, f.frame_start_time)
         current = files_filtered.get(key)
         if current is None:
             files_filtered[key] = f
