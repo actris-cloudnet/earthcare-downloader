@@ -24,7 +24,7 @@ class TaskParams:
     output_path: Path
     by_product: bool
     quiet: bool | None
-    no_prompt: bool
+    yes: bool
     force: bool
 
 

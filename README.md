@@ -50,7 +50,7 @@ where the arguments are:
 | `--max-workers`         | Maximum number of concurrent downloads (default: **5**).                        |
 | `--token`               | MAAP offline token for authentication.                                          |
 | `-q`, `--quiet`         | Hide progress bars during download.                                             |
-| `--no-prompt`           | Skip confirmation prompt before downloading.                                    |
+| `-y`, `--yes`           | Skip confirmation prompt before downloading.                                    |
 | `--all`                 | Download all versions of the file. By default download only the newest version. |
 | `-f`, `--force`         | Force downloading, even if file with the same name exists in the target folder. |
 | `-h`, `--help`          | Show help message and exit.                                                     |

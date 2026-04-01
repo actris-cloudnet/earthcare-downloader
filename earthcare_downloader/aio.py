@@ -74,7 +74,7 @@ async def download(
         max_workers=max_workers,
         output_path=Path(output_path),
         quiet=quiet,
-        no_prompt=False,
+        yes=False,
         by_product=by_product,
         force=force,
     )

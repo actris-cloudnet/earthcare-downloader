@@ -97,7 +97,7 @@ async def search_and_download(
             f"{proc_str}"
         )
 
-    if not task_params.no_prompt:
+    if not task_params.yes:
         confirmed = input(
             f"Proceed with downloading {len(files)} files? [y/n]: "
         ).strip().lower() in ("y", "yes")

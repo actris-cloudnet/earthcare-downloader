@@ -124,9 +124,10 @@ def main():
         default=False,
     )
     parser.add_argument(
-        "--no-prompt",
+        "-y",
+        "--yes",
         action="store_true",
-        help="Disable prompt for confirmation before downloading files.",
+        help="Skip confirmation prompt before downloading.",
         default=False,
     )
     parser.add_argument(
@@ -181,7 +182,7 @@ def main():
         output_path=Path(args.output_path),
         by_product=args.by_product,
         quiet=args.quiet,
-        no_prompt=args.no_prompt,
+        yes=args.yes,
         force=args.force,
     )
 
