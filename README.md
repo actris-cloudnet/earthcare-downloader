@@ -40,6 +40,7 @@ where the arguments are:
 | `--orbit-min`           | Minimum orbit number.                                                           |
 | `--orbit-max`           | Maximum orbit number.                                                           |
 | `--orbit`               | Single orbit number. Overrides `--orbit-min` and `--orbit-max`                  |
+| `--baseline`            | Filter by processing baseline (e.g. `BA`).                                      |
 | `--lat LAT`             | Latitude of the target location (-90..90 degrees). Use with `--lon` and `-r`    |
 | `--lon LON`             | Longitude of the target location (-180..180 degrees). Use with `--lat` and `-r` |
 | `-r`, `--radius`        | Search radius around the location in km. Use with `--lat` and `--lon`.          |
@@ -70,11 +71,11 @@ Available products:
 |                                                     | [ATL_AER_2A](https://earthcarehandbook.earth.esa.int/catalogue/atl_aer_2a)     | ATLID Aerosol Parameters                         |
 |                                                     | [ATL_ALD_2A](https://earthcarehandbook.earth.esa.int/catalogue/atl_ald_2a)     | ATLID Aerosol Layer Descriptors                  |
 |                                                     | [ATL_CLA_2A](https://earthcarehandbook.earth.esa.int/catalogue/atl_cla_2a)     | ATLID Cloud and Aerosol Classification           |
-|                                                     | [ATL_CTH_2A](https://earthcarehandbook.earth.esa.int/catalogue/am__cth_2b)     | ATLID Cloud Top Height                           |
+|                                                     | [ATL_CTH_2A](https://earthcarehandbook.earth.esa.int/catalogue/atl_cth_2a)     | ATLID Cloud Top Height                           |
 |                                                     | [ATL_EBD_2A](https://earthcarehandbook.earth.esa.int/catalogue/atl_ebd_2a)     | ATLID Extinction, Backscatter and Depolarization |
 |                                                     | [ATL_FM\_\_2A](https://earthcarehandbook.earth.esa.int/catalogue/atl_fm__2a)   | ATLID Feature Mask                               |
 |                                                     | [ATL_ICE_2A](https://earthcarehandbook.earth.esa.int/catalogue/atl_ice_2a)     | ATLID Ice Parameters                             |
-|                                                     | [ATL_TC\_\_2A](https://earthcarehandbook.earth.esa.int/catalogue/ac__tc__2b)   | ATLID Target Classification                      |
+|                                                     | [ATL_TC\_\_2A](https://earthcarehandbook.earth.esa.int/catalogue/atl_tc__2a)   | ATLID Target Classification                      |
 |                                                     | [CPR_CD\_\_2A](https://earthcarehandbook.earth.esa.int/catalogue/cpr_cd__2a)   | CPR Cloud Doppler parameters                     |
 |                                                     | [CPR_CLD_2A](https://earthcarehandbook.earth.esa.int/catalogue/cpr_cld_2a)     | CPR Cloud Parameters                             |
 |                                                     | [CPR_FMR_2A](https://earthcarehandbook.earth.esa.int/catalogue/cpr_fmr_2a)     | CPR Feature Mask and Radar Reflectivity          |
