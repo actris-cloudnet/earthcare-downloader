@@ -107,13 +107,27 @@ async def _fetch_items(
     items.extend(data.get("features", []))
 
     while next_link := _find_next_link(data.get("links", [])):
-        async with session.get(next_link["href"]) as response:
-            response.raise_for_status()
-            data = await response.json()
-
+        data = await _fetch_next_page(session, next_link, body)
         items.extend(data.get("features", []))
 
     return items
+
+
+async def _fetch_next_page(
+    session: aiohttp.ClientSession, link: dict, body: dict
+) -> dict:
+    """Follow a STAC pagination link, using POST with body when specified."""
+    if link.get("method", "GET").upper() == "POST":
+        next_body = link.get("body", {})
+        if link.get("merge", False):
+            next_body = {**body, **next_body}
+        async with session.post(link["href"], json=next_body) as response:
+            response.raise_for_status()
+            return await response.json()
+
+    async with session.get(link["href"]) as response:
+        response.raise_for_status()
+        return await response.json()
 
 
 def _build_search_body(
