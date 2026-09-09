@@ -301,7 +301,10 @@ async def _exchange_token(offline_token: str) -> str:
             },
         ) as response,
     ):
-        response.raise_for_status()
+        if response.status >= 400:
+            detail = await response.text()
+            msg = f"MAAP token exchange failed ({response.status}): {detail}"
+            raise RuntimeError(msg)
         data = await response.json()
         return data["access_token"]
 
