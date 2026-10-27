@@ -1,10 +1,13 @@
 import asyncio
 import contextlib
 import datetime
+import logging
 from collections import defaultdict
 from pathlib import Path
+from typing import Any
 
 import aiohttp
+from aiohttp import ClientResponseError
 
 from earthcare_downloader import utils
 
@@ -13,6 +16,8 @@ from .products import COLLECTIONS_WITHOUT_ORBIT, PRODUCT_TO_COLLECTIONS
 
 BASE_URL = "https://catalog.maap.eo.esa.int/catalogue"
 _STAC_DATETIME_FMT = "%Y-%m-%dT%H:%M:%S.%fZ"
+
+logger = logging.getLogger(__name__)
 
 
 async def get_files(params: SearchParams) -> list[File]:
@@ -100,10 +105,7 @@ async def _fetch_items(
     body = _build_search_body(collection, products, params)
     items: list[dict] = []
 
-    async with session.post(f"{BASE_URL}/search", json=body) as response:
-        response.raise_for_status()
-        data = await response.json()
-
+    data = await _request_json(session.post, f"{BASE_URL}/search", json=body)
     items.extend(data.get("features", []))
 
     while next_link := _find_next_link(data.get("links", [])):
@@ -121,13 +123,8 @@ async def _fetch_next_page(
         next_body = link.get("body", {})
         if link.get("merge", False):
             next_body = {**body, **next_body}
-        async with session.post(link["href"], json=next_body) as response:
-            response.raise_for_status()
-            return await response.json()
-
-    async with session.get(link["href"]) as response:
-        response.raise_for_status()
-        return await response.json()
+        return await _request_json(session.post, link["href"], json=next_body)
+    return await _request_json(session.get, link["href"])
 
 
 def _build_search_body(
@@ -204,3 +201,23 @@ def _build_cql_filter(
 
 def _find_next_link(links: list[dict]) -> dict | None:
     return next((link for link in links if link.get("rel") == "next"), None)
+
+
+async def _request_json(request_func, *args, max_retries: int = 3, **kwargs) -> Any:
+    for attempt in range(1, max_retries + 1):
+        try:
+            async with request_func(*args, **kwargs) as response:
+                response.raise_for_status()
+                return await response.json()
+        except ClientResponseError as err:
+            if 400 <= err.status < 500:
+                raise err
+            retryable_err: Exception = err
+        except (aiohttp.ClientError, asyncio.TimeoutError) as err:
+            retryable_err = err
+
+        logger.warning("Attempt %d failed: %s", attempt, retryable_err)
+        if attempt >= max_retries:
+            logger.error("Giving up after %d attempts.", max_retries)
+            raise retryable_err
+        await asyncio.sleep(2**attempt)
