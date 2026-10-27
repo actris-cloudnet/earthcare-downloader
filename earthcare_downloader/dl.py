@@ -220,10 +220,10 @@ async def _download_with_retries(
                     return extracted
                 return [params.destination]
             except (aiohttp.ClientError, asyncio.TimeoutError) as e:
-                logger.warning(f"Attempt {attempt} failed for {params.url}: {e}")
+                logger.warning("Attempt %d failed for %s: %s", attempt, params.url, e)
                 if attempt >= max_retries:
                     logger.error(
-                        f"Giving up on {params.url} after {max_retries} attempts."
+                        "Giving up on %s after %d attempts.", params.url, max_retries
                     )
                     raise
                 await asyncio.sleep(2**attempt)
