@@ -12,7 +12,7 @@ repos:
         args: ["--fix", "lf"]
       - id: trailing-whitespace
   - repo: https://github.com/astral-sh/ruff-pre-commit
-    rev: v0.14.2
+    rev: v0.17.3
     hooks:
       - id: ruff
         args: ["--fix"]
@@ -30,10 +30,10 @@ repos:
     hooks:
       - id: prettier
   - repo: https://github.com/pappasam/toml-sort
-    rev: v0.24.3
+    rev: v0.25.0
     hooks:
       - id: toml-sort-fix
   - repo: https://github.com/crate-ci/typos
-    rev: v1.38.1
+    rev: v1.51.1
     hooks:
       - id: typos
